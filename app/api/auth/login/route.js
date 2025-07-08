@@ -13,7 +13,7 @@ export async function POST(request) {
         }
 
         const client = await clientPromise;
-        const db = client.db("UserDB"); // আপনার ডেটাবেসের নাম দিন
+        const db = client.db("E-commerceDB"); // আপনার ডেটাবেসের নাম দিন
         const usersCollection = db.collection("users");
 
         // ইমেল দ্বারা ইউজার খুঁজুন।

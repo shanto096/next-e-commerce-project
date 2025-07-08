@@ -8,7 +8,7 @@ export async function GET(request) {
     try {
         // MongoDB ক্লায়েন্টের সাথে সংযোগ স্থাপন করুন।
         const client = await clientPromise;
-        const db = client.db("UserDB"); // আপনার ডেটাবেসের নাম দিন
+        const db = client.db("E-commerceDB"); // আপনার ডেটাবেসের নাম দিন
 
         // 'users' কালেকশন থেকে সমস্ত ডকুমেন্ট খুঁজে বের করুন।
         const users = await db.collection("users").find({}).toArray();
@@ -43,7 +43,7 @@ export async function POST(request) {
 
         // MongoDB ক্লায়েন্টের সাথে সংযোগ স্থাপন করুন।
         const client = await clientPromise;
-        const db = client.db("your_database_name"); // আপনার ডেটাবেসের নাম দিন
+        const db = client.db("E-commerceDB"); // আপনার ডেটাবেসের নাম দিন
 
         // 'users' কালেকশনে নতুন ডকুমেন্ট যোগ করুন।
         const result = await db.collection("users").insertOne({ name, email, createdAt: new Date() });
