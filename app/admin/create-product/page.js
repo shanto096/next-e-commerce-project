@@ -2,6 +2,7 @@
 'use client'; // এটি একটি ক্লায়েন্ট কম্পোনেন্ট, কারণ এতে ইন্টারঅ্যাকটিভিটি আছে।
 
 import { useState } from 'react';
+import Link from 'next/link';
 
 // প্রোডাক্ট তৈরি করার পেজ কম্পোনেন্ট
 export default function CreateProductPage() {
@@ -125,9 +126,9 @@ export default function CreateProductPage() {
           </p>
         )}
         <p className="mt-6 text-center text-sm text-gray-600">
-          <a href="/products" className="font-medium text-blue-600 hover:text-blue-500 transition duration-150 ease-in-out">
+          <Link href="/products" className="font-medium text-blue-600 hover:text-blue-500 transition duration-150 ease-in-out">
             সমস্ত প্রোডাক্ট দেখুন
-          </a>
+          </Link>
         </p>
       </div>
     </div>
