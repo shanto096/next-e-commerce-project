@@ -1,5 +1,5 @@
 // app/api/users/route.js
-import clientPromise from '@/lib/mongodb';
+import clientPromise from '../../../lib/mongodb';
 import { NextResponse } from 'next/server';
 
 // GET রিকোয়েস্ট হ্যান্ডেল করার জন্য একটি অ্যাসিঙ্ক্রোনাস ফাংশন।

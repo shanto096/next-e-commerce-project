@@ -1,6 +1,6 @@
 // app/api/auth/register/route.js
 import { NextResponse } from 'next/server';
-import clientPromise from '@/lib/mongodb'; // MongoDB ক্লায়েন্ট ইম্পোর্ট করুন
+import clientPromise from '../../../../lib/mongodb'; // MongoDB ক্লায়েন্ট ইম্পোর্ট করুন
 import bcrypt from 'bcryptjs'; // পাসওয়ার্ড হ্যাশ করার জন্য bcryptjs ইম্পোর্ট করুন
 
 export async function POST(request) {
