@@ -16,7 +16,7 @@ export default function AllProductsPage() {
     fetchProducts(); // কম্পোনেন্ট মাউন্ট হওয়ার পর প্রোডাক্ট ফেচ করা
   }, []);
 
-  const fetchProducts = async () => {
+ const fetchProducts = async () => {
     setLoading(true); // লোডিং শুরু
     setError(null); // পূর্বের ত্রুটি পরিষ্কার করা
 

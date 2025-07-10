@@ -25,7 +25,7 @@ export default function CreateProductPage() {
       setLoading(false);
       return;
     }
-
+    // console.log(name, title, category, description);
     try {
       // /api/products এপিআইতে POST রিকোয়েস্ট পাঠানো
       const response = await fetch('/api/products', {
