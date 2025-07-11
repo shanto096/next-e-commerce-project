@@ -29,6 +29,7 @@ export async function POST(request) {
         const result = await usersCollection.insertOne({
             email,
             password: hashedPassword,
+            role: 'user',
             createdAt: new Date(),
         });
 

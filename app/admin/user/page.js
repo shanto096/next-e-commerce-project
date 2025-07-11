@@ -2,8 +2,8 @@
 import { useEffect, useState } from "react";
 
 function CreateUserModal({ isOpen, onClose, onUserCreated }) {
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -15,12 +15,12 @@ function CreateUserModal({ isOpen, onClose, onUserCreated }) {
       const res = await fetch("/api/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email }),
+        body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to create user");
-      setName("");
-      setEmail("");
+      setEmail(" ");
+      setPassword(" ");
       onUserCreated();
       onClose();
     } catch (err) {
@@ -36,16 +36,7 @@ function CreateUserModal({ isOpen, onClose, onUserCreated }) {
       <div className=" bg-black border-2 border-white p-6 rounded-lg shadow-lg w-full max-w-md">
         <h2 className="text-xl font-semibold mb-4">Create New User</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Name</label>
-            <input
-              type="text"
-              className="w-full border px-3 py-2 rounded"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-          </div>
+          
           <div>
             <label className="block text-sm font-medium mb-1">Email</label>
             <input
@@ -53,6 +44,16 @@ function CreateUserModal({ isOpen, onClose, onUserCreated }) {
               className="w-full border px-3 py-2 rounded"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Password</label>
+            <input
+              type="password"
+              className="w-full border px-3 py-2 rounded"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
@@ -81,14 +82,14 @@ function CreateUserModal({ isOpen, onClose, onUserCreated }) {
 }
 
 function EditUserModal({ isOpen, onClose, user, onUserUpdated }) {
-  const [name, setName] = useState(user?.name || "");
   const [email, setEmail] = useState(user?.email || "");
+  const [password, setPassword] = useState(user?.name || "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    setName(user?.name || "");
     setEmail(user?.email || "");
+    setPassword(user?.password || "");
   }, [user]);
 
   const handleSubmit = async (e) => {
@@ -118,16 +119,7 @@ function EditUserModal({ isOpen, onClose, user, onUserUpdated }) {
       <div className="bg-black border-2 border-white p-6 rounded-lg shadow-lg w-full max-w-md">
         <h2 className="text-xl font-semibold mb-4 text-white">Edit User</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1 text-white">Name</label>
-            <input
-              type="text"
-              className="w-full border px-3 py-2 rounded"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-          </div>
+         
           <div>
             <label className="block text-sm font-medium mb-1 text-white">Email</label>
             <input
@@ -135,6 +127,16 @@ function EditUserModal({ isOpen, onClose, user, onUserUpdated }) {
               className="w-full border px-3 py-2 rounded"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1 text-white">Password</label>
+            <input
+              type="password"
+              className="w-full border px-3 py-2 rounded"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>

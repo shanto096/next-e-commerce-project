@@ -47,11 +47,11 @@ export async function GET(request) {
 export async function POST(request) {
     try {
         // রিকোয়েস্ট বডি থেকে JSON ডেটা পার্স করা হচ্ছে।
-        const { name, email } = await request.json();
+        const { email, password } = await request.json();
 
         // যদি নাম বা ইমেল না থাকে, তাহলে 400 (Bad Request) ত্রুটি ফিরিয়ে দিন।
-        if (!name || !email) {
-            return NextResponse.json({ message: 'Name and email are required.' }, { status: 400 });
+        if (!email || !password) {
+            return NextResponse.json({ message: 'Email and password are required.' }, { status: 400 });
         }
 
         // MongoDB ক্লায়েন্টের সাথে সংযোগ স্থাপন করুন।
@@ -59,13 +59,13 @@ export async function POST(request) {
         const db = client.db("E-commerceDB"); // আপনার ডেটাবেসের নাম দিন
 
         // 'users' কালেকশনে নতুন ডকুমেন্ট যোগ করুন।
-        const result = await db.collection("users").insertOne({ name, email, createdAt: new Date() });
+        const result = await db.collection("users").insertOne({ email, password, role: 'user', createdAt: new Date() });
 
         // সফল JSON রেসপন্স ফিরিয়ে দিন।
         return NextResponse.json({
             message: 'User added successfully!',
             userId: result.insertedId, // নতুন যোগ করা ইউজারের ID
-            data: { name, email }
+            data: { email, password, role: 'user' }
         }, { status: 201 }); // 201 Created স্ট্যাটাস কোড
 
     } catch (error) {
