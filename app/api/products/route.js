@@ -34,7 +34,7 @@ export async function POST(request) {
         console.log(name, title, category, description);
 
         // // প্রয়োজনীয় ফিল্ডগুলো আছে কিনা তা যাচাই করুন।
-        if (!name || !title || !!category || !description) { // এখানে একটি অতিরিক্ত ! ছিল, সেটিও ঠিক করা হয়েছে
+        if (!name || !title || !category || !description) { // এখানে একটি অতিরিক্ত ! ছিল, সেটিও ঠিক করা হয়েছে
             return NextResponse.json({ message: 'All fields (name, title, category, description) are required.' }, { status: 400 } // 400 Bad Request
             );
         }

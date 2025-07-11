@@ -42,3 +42,49 @@ export async function GET(request, { params }) {
         }, { status: 500 });
     }
 }
+
+// PUT: Update a product by ID
+export async function PUT(request, { params }) {
+    try {
+        const { id } = params;
+        if (!ObjectId.isValid(id)) {
+            return NextResponse.json({ message: 'Invalid product ID format.' }, { status: 400 });
+        }
+        const { name, title, category, description } = await request.json();
+        if (!name || !title || !category || !description) {
+            return NextResponse.json({ message: 'All fields (name, title, category, description) are required.' }, { status: 400 });
+        }
+        const client = await clientPromise;
+        const db = client.db("E-commerceDB");
+        const productsCollection = db.collection("products");
+        const result = await productsCollection.updateOne({ _id: new ObjectId(id) }, { $set: { name, title, category, description, updatedAt: new Date() } });
+        if (result.matchedCount === 0) {
+            return NextResponse.json({ message: 'Product not found.' }, { status: 404 });
+        }
+        return NextResponse.json({ message: 'Product updated successfully!' }, { status: 200 });
+    } catch (error) {
+        console.error('Error updating product:', error);
+        return NextResponse.json({ message: 'Error updating product.', error: error.message }, { status: 500 });
+    }
+}
+
+// DELETE: Delete a product by ID
+export async function DELETE(request, { params }) {
+    try {
+        const { id } = params;
+        if (!ObjectId.isValid(id)) {
+            return NextResponse.json({ message: 'Invalid product ID format.' }, { status: 400 });
+        }
+        const client = await clientPromise;
+        const db = client.db("E-commerceDB");
+        const productsCollection = db.collection("products");
+        const result = await productsCollection.deleteOne({ _id: new ObjectId(id) });
+        if (result.deletedCount === 0) {
+            return NextResponse.json({ message: 'Product not found.' }, { status: 404 });
+        }
+        return NextResponse.json({ message: 'Product deleted successfully!' }, { status: 200 });
+    } catch (error) {
+        console.error('Error deleting product:', error);
+        return NextResponse.json({ message: 'Error deleting product.', error: error.message }, { status: 500 });
+    }
+}
