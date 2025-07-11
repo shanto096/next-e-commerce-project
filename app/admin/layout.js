@@ -3,7 +3,7 @@ import Link from "next/link";
 const sidebarItems = [
   { name: "Dashboard", href: "/admin/dashboard" },
   { name: "User", href: "/admin/user" },
-  { name: "Create Product", href: "/admin/create-product" },
+  { name: "Products", href: "/admin/products" },
 ];
 
 export default function AdminLayout({ children }) {
