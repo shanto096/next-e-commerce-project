@@ -215,13 +215,17 @@ export default function ProductPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 10;
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (pageNum = page) => {
     try {
       setLoading(true);
-      const response = await fetch("/api/products");
+      const response = await fetch(`/api/products?page=${pageNum}&limit=${limit}`);
       const data = await response.json();
       setProducts(data.data);
+      setTotalPages(data.totalPages || 1);
     } catch (error) {
       setError(error);
     } finally {
@@ -230,11 +234,12 @@ export default function ProductPage() {
   };
 
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    fetchProducts(page);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page]);
 
   const handleProductCreated = () => {
-    fetchProducts();
+    fetchProducts(page);
   };
 
   const handleDelete = async (id) => {
@@ -246,7 +251,12 @@ export default function ProductPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to delete product");
-      fetchProducts();
+      // If last item on page deleted, go to previous page if not on first
+      if (products.length === 1 && page > 1) {
+        setPage(page - 1);
+      } else {
+        fetchProducts(page);
+      }
     } catch (err) {
       setError(err);
     } finally {
@@ -260,7 +270,14 @@ export default function ProductPage() {
   };
 
   const handleProductUpdated = () => {
-    fetchProducts();
+    fetchProducts(page);
+  };
+
+  const handlePrev = () => {
+    if (page > 1) setPage(page - 1);
+  };
+  const handleNext = () => {
+    if (page < totalPages) setPage(page + 1);
   };
 
   return (
@@ -315,6 +332,24 @@ export default function ProductPage() {
             ))}
           </tbody>
         </table>
+      </div>
+      {/* Pagination Controls */}
+      <div className="flex justify-center items-center mt-4 space-x-2">
+        <button
+          className="px-3 py-1 rounded bg-gray-200 text-gray-700 disabled:opacity-50"
+          onClick={handlePrev}
+          disabled={page === 1}
+        >
+          Prev
+        </button>
+        <span className="px-2">Page {page} of {totalPages}</span>
+        <button
+          className="px-3 py-1 rounded bg-gray-200 text-gray-700 disabled:opacity-50"
+          onClick={handleNext}
+          disabled={page === totalPages}
+        >
+          Next
+        </button>
       </div>
     </div>
   );

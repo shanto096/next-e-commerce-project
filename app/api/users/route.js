@@ -7,17 +7,29 @@ import { ObjectId } from 'mongodb';
 // এই এপিআই /api/users পাথে অ্যাক্সেস করা যাবে এবং সমস্ত ইউজার ডেটা ফিরিয়ে দেবে।
 export async function GET(request) {
     try {
-        // MongoDB ক্লায়েন্টের সাথে সংযোগ স্থাপন করুন।
+        const { searchParams } = new URL(request.url);
+        const page = parseInt(searchParams.get('page')) || 1;
+        const limit = parseInt(searchParams.get('limit')) || 10;
+        const skip = (page - 1) * limit;
+
         const client = await clientPromise;
-        const db = client.db("E-commerceDB"); // আপনার ডেটাবেসের নাম দিন
+        const db = client.db("E-commerceDB");
+        const usersCollection = db.collection("users");
 
-        // 'users' কালেকশন থেকে সমস্ত ডকুমেন্ট খুঁজে বের করুন।
-        const users = await db.collection("users").find({}).toArray();
+        const total = await usersCollection.countDocuments();
+        const users = await usersCollection.find({})
+            .skip(skip)
+            .limit(limit)
+            .toArray();
+        const totalPages = Math.ceil(total / limit);
 
-        // সফল JSON রেসপন্স ফিরিয়ে দিন।
         return NextResponse.json({
             message: 'Users fetched successfully!',
-            data: users
+            data: users,
+            total,
+            totalPages,
+            page,
+            limit
         }, { status: 200 });
 
     } catch (error) {

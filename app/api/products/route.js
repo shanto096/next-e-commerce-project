@@ -6,13 +6,29 @@ import clientPromise from '../../../lib/mongodb'; // সঠিক রিলে�
 // এই এপিআই /api/products পাথে অ্যাক্সেস করা যাবে এবং সমস্ত প্রোডাক্ট ডেটা ফিরিয়ে দেবে।
 export async function GET(request) {
     try {
+        const { searchParams } = new URL(request.url);
+        const page = parseInt(searchParams.get('page')) || 1;
+        const limit = parseInt(searchParams.get('limit')) || 10;
+        const skip = (page - 1) * limit;
+
         const client = await clientPromise;
-        const db = client.db("E-commerceDB"); // আপনার ডেটাবেসের নাম দিন
-        const products = await db.collection("products").find({}).toArray();
+        const db = client.db("E-commerceDB");
+        const productsCollection = db.collection("products");
+
+        const total = await productsCollection.countDocuments();
+        const products = await productsCollection.find({})
+            .skip(skip)
+            .limit(limit)
+            .toArray();
+        const totalPages = Math.ceil(total / limit);
 
         return NextResponse.json({
             message: 'Products fetched successfully!',
-            data: products
+            data: products,
+            total,
+            totalPages,
+            page,
+            limit
         }, { status: 200 });
 
     } catch (error) {
