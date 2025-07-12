@@ -165,6 +165,7 @@ function EditUserModal({ isOpen, onClose, user, onUserUpdated }) {
 }
 
 export default function UserPage() {
+
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

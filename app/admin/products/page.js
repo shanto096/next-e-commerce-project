@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useAuth } from "../../context/AuthContext";
 
 function CreateProductModal({ isOpen, onClose, onProductCreated }) {
   const [name, setName] = useState("");
@@ -209,6 +210,8 @@ function EditProductModal({ isOpen, onClose, product, onProductUpdated }) {
 }
 
 export default function ProductPage() {
+  const { users } = useAuth();
+  console.log(users);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
