@@ -7,6 +7,7 @@ const Navbar = () => {
   const { user, logout } = useAuth();
 
   return (
+    // navbar
     <nav className="w-full flex items-center justify-between py-4 px-8 border-b border-gray-200 bg-black">
       <div className="text-xl font-bold text-white">E-Commerce</div>
       <ul className="flex space-x-6 items-center">
