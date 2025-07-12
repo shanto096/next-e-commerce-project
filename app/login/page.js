@@ -1,53 +1,51 @@
-// app/login/page.js
-'use client'; // এটি একটি ক্লায়েন্ট কম্পোনেন্ট, কারণ এতে ইন্টারঅ্যাকটিভিটি আছে।
+'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation'; // যদি লগইনের পর রিডাইরেক্ট করতে চান
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
-// লগইন পেজ কম্পোনেন্ট
 export default function LoginPage() {
-  const [email, setEmail] = useState(''); // ইমেল স্টেট
-  const [password, setPassword] = useState(''); // পাসওয়ার্ড স্টেট
-  const [message, setMessage] = useState(''); // মেসেজ স্টেট (সফলতা বা ত্রুটি বার্তা দেখানোর জন্য)
-  const [loading, setLoading] = useState(false); // লোডিং স্টেট
-  const router = useRouter(); // যদি লগইনের পর রিডাইরেক্ট করতে চান
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [showAlert, setShowAlert] = useState(false); // alert trigger করার জন্য আলাদা state
+  const router = useRouter();
 
-  // ফর্ম সাবমিট হ্যান্ডলার ফাংশন
+  useEffect(() => {
+    if (showAlert) {
+      alert('Login Successfully');
+      setShowAlert(false);
+    }
+  }, [showAlert]);
+
   const handleSubmit = async (e) => {
-    e.preventDefault(); // ফর্মের ডিফল্ট সাবমিট আচরণ বন্ধ করা
-    setLoading(true); // লোডিং শুরু
-    setMessage(''); // পূর্বের মেসেজ পরিষ্কার করা
+    e.preventDefault();
+    setLoading(true);
+    setMessage('');
 
     try {
-      // /api/auth/login এপিআইতে POST রিকোয়েস্ট পাঠানো
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }), // ইমেল এবং পাসওয়ার্ড JSON ফরম্যাটে পাঠানো
+        body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json(); // রেসপন্স JSON ফরম্যাটে পার্স করা
+      const data = await response.json();
 
       if (response.ok) {
-        // যদি রেসপন্স সফল হয় (স্ট্যাটাস 2xx)
         setMessage(`Login successful: ${data.message}. Welcome, ${data.user.email}!`);
-        alert('Login Successfully');
-        router.push('/');
-        // এখানে আপনি ইউজারের সেশন ম্যানেজমেন্ট করতে পারেন, যেমন JWT টোকেন সংরক্ষণ করা
-        // উদাহরণস্বরূপ: localStorage.setItem('token', data.token);
-        // router.push('/dashboard'); // লগইনের পর ড্যাশবোর্ড পেজে রিডাইরেক্ট করা
+        setShowAlert(true); // alert trigger করো
+        router.push('/'); // রিডাইরেক্ট করো
       } else {
-        // যদি রেসপন্স ব্যর্থ হয় (স্ট্যাটাস 4xx বা 5xx)
         setMessage(`Login failed: ${data.message || 'Invalid credentials.'}`);
       }
     } catch (error) {
-      // নেটওয়ার্ক ত্রুটি বা অন্য কোনো ত্রুটি হলে
       console.error('Error during login:', error);
       setMessage('An error occurred. Please try again.');
     } finally {
-      setLoading(false); // লোডিং শেষ
+      setLoading(false);
     }
   };
 
