@@ -1,8 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
+import Header from "./components/Header"
 
 export default function Home() {
   return (
+    <>
+    <Header/>
     <main className="min-h-screen flex flex-row items-center justify-center p-24">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
         <h1 className="text-4xl font-bold">Welcome to Our E-commerce Store</h1>
@@ -23,5 +26,6 @@ export default function Home() {
         </div>
       </div>
     </main>
+    </>
   );
 }
