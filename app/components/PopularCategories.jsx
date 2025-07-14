@@ -67,7 +67,7 @@ export default function PopularCategories() {
           container.scrollBy({ left: 300, behavior: 'smooth' });
         }
       }
-    }, 5000);
+    }, 10000);
 
     return () => clearInterval(interval);
   }, []);
