@@ -72,7 +72,7 @@ export default function HeroSection() {
         </motion.button>
       </motion.div>
 
-      {/* Right Image */}
+      {/* Right Image  here*/} 
       <motion.div
         key={`right-${animationKey}`}
         initial={{ opacity: 0, y: 30 }}
