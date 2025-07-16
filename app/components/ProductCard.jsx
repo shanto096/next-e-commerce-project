@@ -12,6 +12,7 @@ export default function ProductCard({ product }) {
       </div>
       <div className="absolute top-3 right-3 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
         -{product.discount}%
+        
       </div>
       <img src={product.image} alt={product.name} className="w-48 h-48 object-contain mx-auto my-5" />
       <div className="text-center mt-4">
