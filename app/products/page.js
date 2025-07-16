@@ -5,7 +5,7 @@ import ProductList from '../components/ProductList';
 
 
 export default function HomePage() {
-  const [selected, setSelected] = useState("Meat");
+  const [selected, setSelected] = useState("All");
 
   return (
     <main className="max-w-7xl mx-auto p-6">
