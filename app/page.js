@@ -1,35 +1,104 @@
-import Image from "next/image";
-import Link from "next/link";
-import Header from "./components/Header"
-import PopularCategories from "./components/PopularCategories"
-import Banner from "./components/Banner"
+// app/components/RecentNewsSlider.jsx
+'use client';
 
-export default function Home() {
+import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
+
+const newsData = [
+  {
+    id: 1,
+    image: '/images/vegetables.jpg',
+    title: 'All time fresh every time healthy',
+    description:
+      'Lorem ipsum dolor sit amet, consectetuer adipiscing elit doli. Aenean commodo ligula eget dolor.',
+  },
+  {
+    id: 2,
+    image: '/images/almonds.jpg',
+    title: 'Vegina special liquide fesh vagi',
+    description:
+      'Lorem ipsum dolor sit amet, consectetuer adipiscing elit doli. Aenean commodo ligula eget dolor.',
+  },
+  {
+    id: 3,
+    image: '/images/salad.jpg',
+    title: 'Green onion knife and salad placed',
+    description:
+      'Lorem ipsum dolor sit amet, consectetuer adipiscing elit doli. Aenean commodo ligula eget dolor.',
+  },
+  {
+    id: 4,
+    image: '/images/salad.jpg',
+    title: 'Green onion knife and salad placed',
+    description:
+      'Lorem ipsum dolor sit amet, consectetuer adipiscing elit doli. Aenean commodo ligula eget dolor.',
+  },
+  {
+    id: 5,
+    image: '/images/salad.jpg',
+    title: 'Green onion knife and salad placed',
+    description:
+      'Lorem ipsum dolor sit amet, consectetuer adipiscing elit doli. Aenean commodo ligula eget dolor.',
+  },
+  {
+    id: 6,
+    image: '/images/salad.jpg',
+    title: 'Green onion knife and salad placed',
+    description:
+      'Lorem ipsum dolor sit amet, consectetuer adipiscing elit doli. Aenean commodo ligula eget dolor.',
+  },
+];
+
+const RecentNewsSlider = () => {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % newsData.length);
+    }, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <>
-    <Header/>
-    <PopularCategories/>
-    <Banner/>
-    <main className="min-h-screen flex flex-row items-center justify-center p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <h1 className="text-4xl font-bold">Welcome to Our E-commerce Store</h1>
-        <p className="mt-4 text-lg">Discover amazing products and enjoy a seamless shopping experience.</p>
-        <div className="mt-8 flex gap-4">
-          <Link
-            href="/login"
-            className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 md:py-4 md:px-10 md:text-lg"
+    <div className="w-full py-16 px-4 sm:px-10 bg-white">
+      <h2 className="text-3xl font-bold text-center mb-10">Recent news</h2>
+      <div className="relative w-full overflow-hidden h-[500px]">
+        <AnimatePresence initial={false}>
+          <motion.div
+            key={index}
+            initial={{ x: '100%', opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: '-100%', opacity: 0 }}
+            transition={{ duration: 1.2, ease: 'easeInOut' }}
+            className="absolute top-0 left-0 w-full flex justify-center gap-6"
           >
-            Login
-          </Link>
-          <Link
-            href="/register"
-            className="flex items-center justify-center rounded-md border border-transparent bg-gray-200 px-8 py-3 text-base font-medium text-gray-800 hover:bg-gray-300 md:py-4 md:px-10 md:text-lg"
-          >
-            Register
-          </Link>
-        </div>
+            {newsData.slice(index, index + 3).map((item) => (
+              <div
+                key={item.id}
+                className="bg-white rounded-lg shadow-md max-w-sm w-full"
+              >
+                <Image
+                  src={item.image}
+                  alt={item.title}
+                  width={400}
+                  height={300}
+                  className="rounded-t-lg w-full h-60 object-cover"
+                />
+                <div className="p-5">
+                  <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
+                  <p className="text-gray-600 text-sm mb-4">{item.description}</p>
+                  <button className="text-black font-semibold flex items-center gap-1">
+                    Read more <span className="text-lg">→</span>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </motion.div>
+        </AnimatePresence>
       </div>
-    </main>
-    </>
+    </div>
   );
-}
+};
+
+export default RecentNewsSlider;
