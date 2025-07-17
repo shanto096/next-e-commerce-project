@@ -4,25 +4,46 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-
+import newsImage from '../../public/image/product25.png'
 const newsData = [
   {
     id: 1,
-    image: '/images/vegetables.jpg',
+    image:newsImage,
     title: 'All time fresh every time healthy',
     description:
       'Lorem ipsum dolor sit amet, consectetuer adipiscing elit doli. Aenean commodo ligula eget dolor.',
   },
   {
     id: 2,
-    image: '/images/almonds.jpg',
+    image: newsImage ,
     title: 'Vegina special liquide fesh vagi',
     description:
       'Lorem ipsum dolor sit amet, consectetuer adipiscing elit doli. Aenean commodo ligula eget dolor.',
   },
   {
     id: 3,
-    image: '/images/salad.jpg',
+    image:newsImage,
+    title: 'Green onion knife and salad placed',
+    description:
+      'Lorem ipsum dolor sit amet, consectetuer adipiscing elit doli. Aenean commodo ligula eget dolor.',
+  },
+  {
+    id: 3,
+    image: newsImage,
+    title: 'Green onion knife and salad placed',
+    description:
+      'Lorem ipsum dolor sit amet, consectetuer adipiscing elit doli. Aenean commodo ligula eget dolor.',
+  },
+  {
+    id: 3,
+    image: newsImage,
+    title: 'Green onion knife and salad placed',
+    description:
+      'Lorem ipsum dolor sit amet, consectetuer adipiscing elit doli. Aenean commodo ligula eget dolor.',
+  },
+  {
+    id: 3,
+    image: newsImage,
     title: 'Green onion knife and salad placed',
     description:
       'Lorem ipsum dolor sit amet, consectetuer adipiscing elit doli. Aenean commodo ligula eget dolor.',
@@ -35,7 +56,7 @@ const RecentNewsSlider = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setIndex((prev) => (prev + 1) % newsData.length);
-    }, 10000);
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
 
