@@ -4,12 +4,14 @@ import Header from "./components/Header"
 import PopularCategories from "./components/PopularCategories"
 import Banner from "./components/Banner"
 import RecentNewsSlider from "./components/RecentNewsSlider"
-
+import TrendingProducts from "./components/TrendingProducts"
+  
 export default function Home() {
   return (
     <>
     <Header/>
     <PopularCategories/>
+    <TrendingProducts/>
     <Banner/>
     <RecentNewsSlider/>
     <main className="min-h-screen flex flex-row items-center justify-center p-24">
