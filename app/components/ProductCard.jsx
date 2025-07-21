@@ -19,6 +19,7 @@ export default function ProductCard({ product }) {
         <div className="text-yellow-500 mb-1">★★★★☆ <span className="text-sm text-gray-600">(4.0)</span></div>
         <h3 className="font-semibold text-lg">{product.name}</h3>
         <p className="text-green-600 font-bold">${product.price.toFixed(2)} <span className="text-gray-400 line-through ml-2">${product.oldPrice.toFixed(2)}</span></p>
+        <button className="mt-4 bg-blue-600 text-white py-2 px-4 rounded-full hover:bg-blue-700 transition duration-300">Add to Cart</button>
       </div>
     </motion.div>
   );
