@@ -63,7 +63,7 @@ export default function TrendingProducts() {
 
   // Create an extended array for infinite scrolling
   const extendedProducts = [...products, ...products];
-
+  // add
   return (
     <section className="w-full py-12 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto text-center px-4">
