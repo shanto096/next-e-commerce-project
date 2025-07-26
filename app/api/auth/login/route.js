@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import clientPromise from '../../../../lib/mongodb'; // MongoDB ক্লায়েন্ট ইম্পোর্ট করুন
 import bcrypt from 'bcryptjs'; // পাসওয়ার্ড তুলনা করার জন্য bcryptjs ইম্পোর্ট করুন
+import { generateToken } from '../../../../lib/auth';
 
 export async function POST(request) {
     try {
@@ -32,15 +33,18 @@ export async function POST(request) {
             return NextResponse.json({ message: 'Invalid credentials.' }, { status: 401 }); // 401 Unauthorized
         }
 
-        // লগইন সফল হলে রেসপন্স ফিরিয়ে দিন।
-        // একটি বাস্তব অ্যাপ্লিকেশনে, এখানে একটি JWT (JSON Web Token) তৈরি করে পাঠানো হবে।
-        return NextResponse.json({
-            message: 'Login successful!',
-            user: {
-                id: user._id,
-                email: user.email,
-            }
-        }, { status: 200 });
+        const token = generateToken(user);
+
+        const res = NextResponse.json({ message: 'Login successful', user: { name: user.name, role: user.role } });
+        res.cookies.set('token', token, {
+            httpOnly: true,
+            path: '/',
+            secure: true,
+            sameSite: 'strict',
+            maxAge: 60 * 60 * 24 * 7
+        });
+
+        return res;
 
     } catch (error) {
         console.error('Error during login:', error);
