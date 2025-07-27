@@ -2,7 +2,8 @@
 import { NextResponse } from 'next/server';
 import clientPromise from '../../../../lib/mongodb'; // MongoDB ক্লায়েন্ট ইম্পোর্ট করুন
 import bcrypt from 'bcryptjs'; // পাসওয়ার্ড তুলনা করার জন্য bcryptjs ইম্পোর্ট করুন
-import { generateToken } from '../../../../lib/auth';
+import { serialize } from 'cookie';
+import { generateToken } from '../../../../lib/jwt';
 
 export async function POST(request) {
     try {
@@ -19,6 +20,8 @@ export async function POST(request) {
 
         // ইমেল দ্বারা ইউজার খুঁজুন।
         const user = await usersCollection.findOne({ email });
+        console.log(user);
+
 
         // ইউজার না পাওয়া গেলে ত্রুটি ফিরিয়ে দিন।
         if (!user) {
@@ -33,18 +36,28 @@ export async function POST(request) {
             return NextResponse.json({ message: 'Invalid credentials.' }, { status: 401 }); // 401 Unauthorized
         }
 
-        const token = generateToken(user);
+        // 3. JWT তৈরি করুন
+        const token = generateToken({ userId: user._id, role: user.role, email: user.email });
 
-        const res = NextResponse.json({ message: 'Login successful', user: { name: user.name, role: user.role } });
-        res.cookies.set('token', token, {
-            httpOnly: true,
-            path: '/',
-            secure: true,
-            sameSite: 'strict',
-            maxAge: 60 * 60 * 24 * 7
-        });
+        // 4. JWT কে HTTP-only কুকি হিসাবে সেট করুন
+        const cookieOptions = {
+            httpOnly: true, // ক্লায়েন্ট-সাইড জাভাস্ক্রিপ্ট দ্বারা অ্যাক্সেসযোগ্য নয়
+            // secure: process.env.NODE_ENV === 'production', // শুধুমাত্র HTTPS এ পাঠান
+            // sameSite: 'Lax', // CSRF সুরক্ষা
+            maxAge: 60 * 60 * 24 * 7, // 1 সপ্তাহ (সেকেন্ডে)
+            path: '/', // সমস্ত পাথের জন্য উপলব্ধ
+        };
 
-        return res;
+        const serializedCookie = serialize('jwt', token, cookieOptions);
+
+        // 5. প্রতিক্রিয়াতে কুকি সেট করুন
+        const response = NextResponse.json({
+            message: 'সফলভাবে লগইন করা হয়েছে',
+            user: { id: user.id, email: user.email, role: user.role }
+        }, { status: 200 });
+
+        response.headers.set('Set-Cookie', serializedCookie);
+        return response;
 
     } catch (error) {
         console.error('Error during login:', error);
