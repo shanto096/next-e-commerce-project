@@ -1,3 +1,4 @@
+// app/admin/layout.js
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { verifyToken } from "../../lib/jwt"; // নিশ্চিত করুন যে 'jwt' ফাইলটি আপনার JWT ভেরিফিকেশন লজিক ধারণ করে।
@@ -10,7 +11,8 @@ const sidebarItems = [
 ];
 
 export default async function AdminLayout({ children }) { // async কিওয়ার্ড যোগ করা হয়েছে
-  const cookieStore = cookies();
+  // এখানে পরিবর্তন করা হয়েছে: cookies() ফাংশনটিকে await করা হয়েছে।
+  const cookieStore = await cookies();
   const token = cookieStore.get('jwt'); // আপনার কুকির নাম 'jwt' ধরে নিলাম।
 
   // 1. যদি কোনো টোকেন না থাকে, সরাসরি লগইন পেজে রিডাইরেক্ট করুন।
