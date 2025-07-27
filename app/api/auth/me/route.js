@@ -1,8 +1,9 @@
+import { verifyToken } from '../../../../lib/jwt';
 import { NextResponse } from 'next/server';
-import { verifyToken } from '../../../../lib/auth';
+
 
 export async function GET(req) {
-    const token = req.cookies.get('token') ? req.cookies.get('token').value : null;
+    const token = req.cookies.get('jwt')?.value
     if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     try {
