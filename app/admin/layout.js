@@ -1,15 +1,10 @@
 // app/admin/layout.js
 import { cookies } from "next/headers";
-import Link from "next/link";
 import { verifyToken } from "../../lib/jwt"; // নিশ্চিত করুন যে 'jwt' ফাইলটি আপনার JWT ভেরিফিকেশন লজিক ধারণ করে।
 import { redirect } from 'next/navigation';
+import Sidebar from '../components/Sidebar'
 
 
-const sidebarItems = [
-  { name: "Dashboard", href: "/admin/dashboard" },
-  { name: "User", href: "/admin/user" },
-  { name: "Products", href: "/admin/products" },
-];
 
 export default async function AdminLayout({ children }) { // async কিওয়ার্ড যোগ করা হয়েছে
   // এখানে পরিবর্তন করা হয়েছে: cookies() ফাংশনটিকে await করা হয়েছে।
@@ -45,18 +40,7 @@ export default async function AdminLayout({ children }) { // async কিওয�
   return (
     <div className="flex min-h-screen">
       <aside className="w-56 bg-gray-100 p-6">
-        <nav>
-     
-          <ul className="list-none p-0">
-            {sidebarItems.map((item) => (
-              <li key={item.href} className="mb-4">
-                <Link href={item.href} className="no-underline text-gray-800">
-                  {item.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+       <Sidebar/>
       </aside>
       <main className="flex-1 p-8">{children}</main>
     </div>
