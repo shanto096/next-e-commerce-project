@@ -7,27 +7,33 @@ export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
 
     useEffect(() => {
-        // Load user from localStorage if available
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-            setUser(JSON.parse(storedUser));
-        }
+        // Fetch user from API
+        const fetchUser = async () => {
+            const response = await fetch('/api/auth/me');
+            if (response.ok) {
+                const userData = await response.json();
+                setUser(userData);
+            } else {
+                console.error('Failed to fetch user:', response.statusText);
+            }
+        };
+        fetchUser();
     }, []);
 
     const login = (userData) => {
         setUser(userData);
-        localStorage.setItem("user", JSON.stringify(userData));
+        // Removed localStorage logic
     };
 
     const logout = () => {
         setUser(null);
-        localStorage.removeItem("user");
+        // Removed localStorage logic
     };
 
-    return ( <
-        AuthContext.Provider value = {
-            { user, login, logout } } > { children } 
-            </AuthContext.Provider>
+    return (
+        <AuthContext.Provider value={{ user, login, logout,   }}>
+            {children}
+        </AuthContext.Provider>
     );
 }
 
