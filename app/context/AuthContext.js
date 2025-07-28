@@ -6,17 +6,17 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
 
+    const fetchUser = async () => {
+        const response = await fetch('/api/auth/me');
+        if (response.ok) {
+            const userData = await response.json();
+            setUser(userData);
+        } else {
+            console.error('Failed to fetch user:', response.statusText);
+        }
+    };
+
     useEffect(() => {
-        // Fetch user from API
-        const fetchUser = async () => {
-            const response = await fetch('/api/auth/me');
-            if (response.ok) {
-                const userData = await response.json();
-                setUser(userData);
-            } else {
-                console.error('Failed to fetch user:', response.statusText);
-            }
-        };
         fetchUser();
     }, []);
 
@@ -31,7 +31,7 @@ export function AuthProvider({ children }) {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout,   }}>
+        <AuthContext.Provider value={{ user, login, logout, fetchUser }}>
             {children}
         </AuthContext.Provider>
     );

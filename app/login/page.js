@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../context/AuthContext';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -10,7 +11,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [showAlert, setShowAlert] = useState(false); // alert trigger করার জন্য আলাদা state
   const router = useRouter();
-
+   const {fetchUser}= useAuth()
   useEffect(() => {
     if (showAlert) {
       alert('Login Successfully');
@@ -35,6 +36,7 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (response.ok) {
+        fetchUser()
         setMessage(`Login successful: ${data.message}. Welcome, ${data.user.email}!`);
         setShowAlert(true); // alert trigger করো
         router.push('/'); // রিডাইরেক্ট করো
