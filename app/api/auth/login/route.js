@@ -42,8 +42,8 @@ export async function POST(request) {
         // 4. JWT কে HTTP-only কুকি হিসাবে সেট করুন
         const cookieOptions = {
             httpOnly: true, // ক্লায়েন্ট-সাইড জাভাস্ক্রিপ্ট দ্বারা অ্যাক্সেসযোগ্য নয়
-            // secure: process.env.NODE_ENV === 'production', // শুধুমাত্র HTTPS এ পাঠান
-            // sameSite: 'Lax', // CSRF সুরক্ষা
+            secure: process.env.NODE_ENV === 'production', // শুধুমাত্র HTTPS এ পাঠান
+            sameSite: 'Lax', // CSRF সুরক্ষা
             maxAge: 60 * 60 * 24 * 7, // 1 সপ্তাহ (সেকেন্ডে)
             path: '/', // সমস্ত পাথের জন্য উপলব্ধ
         };
