@@ -25,9 +25,15 @@ export function AuthProvider({ children }) {
         // Removed localStorage logic
     };
 
-    const logout = () => {
-        setUser(null);
-        // Removed localStorage logic
+    const logout = async () => {
+        const response = await fetch('/api/auth/logout', {
+            method: 'POST',
+        });
+        if (response.ok) {
+            setUser(null); // Clear user state
+        } else {
+            console.error('Failed to logout:', response.statusText);
+        }
     };
 
     return (
