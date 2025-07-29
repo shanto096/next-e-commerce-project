@@ -152,20 +152,72 @@ export async function PUT(request, { params }) {
 
 
 // DELETE: Delete a product by ID
+/**
+ * Next.js API Route handler for DELETE requests to /api/products/[id].
+ * Handles product deletion, including deleting the associated image from Cloudinary
+ * and removing product data from MongoDB.
+ *
+ * @param {import('next/server').NextRequest} request - The incoming Next.js request object.
+ * @param {{ params: { id: string } }} context - The context object containing route parameters.
+ * @returns {Promise<import('next/server').NextResponse>} - The Next.js response object.
+ */
 export async function DELETE(request, { params }) {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('jwt');
+
+    // ১. টোকেন আছে কিনা চেক করুন
+    if (!token) {
+        return NextResponse.json({ message: 'Authentication required' }, { status: 401 });
+    }
+
+    let decoded;
+    try {
+        // ২. টোকেন ভেরিফাই করুন।
+        decoded = await verifyToken(token.value);
+    } catch (error) {
+        console.error('API DELETE - JWT verification failed:', error);
+        return NextResponse.json({ message: 'Invalid or expired token' }, { status: 401 });
+    }
+
+    // ৩. রোল চেক করুন (উদাহরণস্বরূপ, শুধু অ্যাডমিনরা প্রোডাক্ট ডিলিট করতে পারবে)
+    if (decoded.role !== 'admin') {
+        return NextResponse.json({ message: 'Access forbidden: Admin privilege required' }, { status: 403 });
+    }
+
     try {
         const { id } = params;
+
+        // প্রোডাক্ট ID এর ফরম্যাট যাচাই করুন
         if (!ObjectId.isValid(id)) {
             return NextResponse.json({ message: 'Invalid product ID format.' }, { status: 400 });
         }
+
         const client = await clientPromise;
         const db = client.db("E-commerceDB");
         const productsCollection = db.collection("products");
-        const result = await productsCollection.deleteOne({ _id: new ObjectId(id) });
-        if (result.deletedCount === 0) {
+
+        // প্রোডাক্ট ডিলিট করার আগে তার তথ্য আনুন ছবির URL পাওয়ার জন্য
+        const productToDelete = await productsCollection.findOne({ _id: new ObjectId(id) });
+
+        if (!productToDelete) {
             return NextResponse.json({ message: 'Product not found.' }, { status: 404 });
         }
+
+        // যদি প্রোডাক্টের সাথে একটি ছবি থাকে, তাহলে Cloudinary থেকে সেটি ডিলিট করুন
+        if (productToDelete.productImage) {
+            await deleteImageFromCloudinary(productToDelete.productImage);
+        }
+
+        // MongoDB থেকে প্রোডাক্ট ডিলিট করুন
+        const result = await productsCollection.deleteOne({ _id: new ObjectId(id) });
+
+        if (result.deletedCount === 0) {
+            // এই ক্ষেত্রে সাধারণত productToDelete না থাকলে এখানে আসবে, কিন্তু সুরক্ষার জন্য রাখা হলো।
+            return NextResponse.json({ message: 'Product not found or already deleted.' }, { status: 404 });
+        }
+
         return NextResponse.json({ message: 'Product deleted successfully!' }, { status: 200 });
+
     } catch (error) {
         console.error('Error deleting product:', error);
         return NextResponse.json({ message: 'Error deleting product.', error: error.message }, { status: 500 });
