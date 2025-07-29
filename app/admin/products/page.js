@@ -59,19 +59,19 @@ function CreateProductModal({ isOpen, onClose, onProductCreated }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-300/50">
-      <div className="bg-black border-2 border-white p-6 rounded-lg shadow-lg w-full max-w-md">
-        <h2 className="text-xl font-semibold mb-4 text-white">Create New Product</h2>
+      <div className="bg-white border-2 border-black p-6 rounded-lg shadow-lg w-full max-w-md">
+        <h2 className="text-xl font-semibold mb-4 ">Create New Product</h2>
         <form onSubmit={handleSubmit} className="space-y-4" encType="multipart/form-data">
           <div>
-            <label className="block text-sm font-medium mb-1 text-white">Name</label>
+            <label className="block text-sm font-medium mb-1 ">Name</label>
             <input type="text" className="w-full border px-3 py-2 rounded" value={name} onChange={(e) => setName(e.target.value)} required />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1 text-white">Title</label>
+            <label className="block text-sm font-medium mb-1 ">Title</label>
             <input type="text" className="w-full border px-3 py-2 rounded" value={title} onChange={(e) => setTitle(e.target.value)} required />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1 text-white">Category</label>
+            <label className="block text-sm font-medium mb-1 ">Category</label>
             <select className="w-full border px-3 py-2 rounded" value={category} onChange={(e) => setCategory(e.target.value)} required>
               <option value="Vegetables">Vegetables</option>
               <option value="Fruits">Fruits</option>
@@ -80,15 +80,15 @@ function CreateProductModal({ isOpen, onClose, onProductCreated }) {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1 text-white">Price</label>
+            <label className="block text-sm font-medium mb-1 ">Price</label>
             <input type="number" className="w-full border px-3 py-2 rounded" value={price} onChange={(e) => setPrice(e.target.value)} required />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1 text-white">Description</label>
+            <label className="block text-sm font-medium mb-1 ">Description</label>
             <textarea className="w-full border px-3 py-2 rounded" value={description} onChange={(e) => setDescription(e.target.value)} required />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1 text-white">Product Image</label>
+            <label className="block text-sm font-medium mb-1 ">Product Image</label>
             <input type="file" accept="image/*" className="w-full" onChange={handleImageChange} required />
           </div>
           {error && <p className="text-red-500 text-sm">{error.message}</p>}
@@ -108,33 +108,55 @@ function CreateProductModal({ isOpen, onClose, onProductCreated }) {
 
 
 
+
 function EditProductModal({ isOpen, onClose, product, onProductUpdated }) {
-  const [name, setName] = useState(product?.name || "");
-  const [title, setTitle] = useState(product?.title || "");
-  const [category, setCategory] = useState(product?.category || "");
-  const [description, setDescription] = useState(product?.description || "");
+  const [name, setName] = useState("");
+  const [title, setTitle] = useState("");
+  const [category, setCategory] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState("");
+  const [productImage, setProductImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    setName(product?.name || "");
-    setTitle(product?.title || "");
-    setCategory(product?.category || "");
-    setDescription(product?.description || "");
+    if (product) {
+      setName(product.name || "");
+      setTitle(product.title || "");
+      setCategory(product.category || "");
+      setDescription(product.description || "");
+      setPrice(product.price || "");
+    }
   }, [product]);
+
+  const handleImageChange = (e) => {
+    setProductImage(e.target.files[0]);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
     try {
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("title", title);
+      formData.append("category", category);
+      formData.append("description", description);
+      formData.append("price", price);
+      if (productImage) {
+        formData.append("productImage", productImage);
+      }
+
       const res = await fetch(`/api/products/${product._id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, title, category, description }),
+        body: formData,
       });
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to update product");
+
       onProductUpdated();
       onClose();
     } catch (err) {
@@ -145,13 +167,14 @@ function EditProductModal({ isOpen, onClose, product, onProductUpdated }) {
   };
 
   if (!isOpen) return null;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-300/50">
-      <div className="bg-black border-2 border-white p-6 rounded-lg shadow-lg w-full max-w-md">
-        <h2 className="text-xl font-semibold mb-4 text-white">Edit Product</h2>
+      <div className="bg-white border-2 border-black p-6 rounded-lg shadow-lg w-full max-w-md">
+        <h2 className="text-xl font-semibold mb-4 ">Edit Product</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1 text-white">Name</label>
+            <label className="block text-sm font-medium mb-1 ">Name</label>
             <input
               type="text"
               className="w-full border px-3 py-2 rounded"
@@ -161,7 +184,7 @@ function EditProductModal({ isOpen, onClose, product, onProductUpdated }) {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1 text-white">Title</label>
+            <label className="block text-sm font-medium mb-1 ">Title</label>
             <input
               type="text"
               className="w-full border px-3 py-2 rounded"
@@ -171,22 +194,47 @@ function EditProductModal({ isOpen, onClose, product, onProductUpdated }) {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1 text-white">Category</label>
-            <input
-              type="text"
+            <label className="block text-sm font-medium mb-1">Category</label>
+            <select
               className="w-full border px-3 py-2 rounded"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               required
-            />
+            >
+              <option value="">Select Category</option>
+              <option value="Vegetables">Vegetables</option>
+              <option value="Fruits">Fruits</option>
+              <option value="Bread">Bread</option>
+              <option value="Meat">Meat</option>
+            </select>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1 text-white">Description</label>
+            <label className="block text-sm font-medium mb-1 ">Description</label>
             <textarea
               className="w-full border px-3 py-2 rounded"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1 ">Price</label>
+            <input
+              type="number"
+              step="0.01"
+              className="w-full border px-3 py-2 rounded"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1 ">Image (optional)</label>
+            <input
+              type="file"
+              accept="image/*"
+              className="w-full"
+              onChange={handleImageChange}
             />
           </div>
           {error && <p className="text-red-500 text-sm">{error.message}</p>}
@@ -212,6 +260,9 @@ function EditProductModal({ isOpen, onClose, product, onProductUpdated }) {
     </div>
   );
 }
+
+
+
 
 export default function ProductPage() {
   const { users } = useAuth();
