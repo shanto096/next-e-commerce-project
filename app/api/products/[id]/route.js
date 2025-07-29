@@ -11,7 +11,7 @@ import { cookies } from 'next/headers';
 // এই এপিআই /api/products/[id] পাথে অ্যাক্সেস করা যাবে এবং একটি নির্দিষ্ট প্রোডাক্ট ফিরিয়ে দেবে।
 export async function GET(request, { params }) {
     try {
-        const { id } = params; // URL থেকে আইডি প্যারামিটার গ্রহণ করুন
+        const { id } = await params; // URL থেকে আইডি প্যারামিটার গ্রহণ করুন
 
         // আইডি একটি বৈধ ObjectId কিনা তা যাচাই করুন।
         if (!ObjectId.isValid(id)) {
@@ -79,7 +79,7 @@ export async function PUT(request, { params }) {
     }
 
     try {
-        const { id } = params;
+        const { id } = await params;
 
         // প্রোডাক্ট ID এর ফরম্যাট যাচাই করুন
         if (!ObjectId.isValid(id)) {
@@ -185,7 +185,7 @@ export async function DELETE(request, { params }) {
     }
 
     try {
-        const { id } = params;
+        const { id } = await params;
 
         // প্রোডাক্ট ID এর ফরম্যাট যাচাই করুন
         if (!ObjectId.isValid(id)) {
