@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers'; // কুকি অ্যাক্সেস করার জন্য
 import { verifyToken } from '../../../lib/jwt'; // আপনার JWT ভেরিফিকেশন ইউটিলিটি
 import clientPromise from '../../../lib/mongodb'; // সঠিক রিলেটিভ পাথ ব্যবহার করা হয়েছে
+import { uploadImageToCloudinary } from '../../../lib/cloudinary'; // Cloudinary আপলোড ইউটিলিটি
 
 // GET রিকোয়েস্ট হ্যান্ডেল করার জন্য একটি অ্যাসিঙ্ক্রোনাস ফাংশন।
 // এই এপিআই /api/products পাথে অ্যাক্সেস করা যাবে এবং সমস্ত প্রোডাক্ট ডেটা ফিরিয়ে দেবে।
@@ -69,18 +70,26 @@ export async function GET(request) {
 
 // POST রিকোয়েস্ট হ্যান্ডেল করার জন্য একটি অ্যাসিঙ্ক্রোনাস ফাংশন।
 // এই এপিআই /api/products পাথে অ্যাক্সেস করা যাবে এবং নতুন প্রোডাক্ট ডেটা ডেটাবেসে যোগ করবে।
+/**
+ * Next.js API Route handler for POST requests to /api/products.
+ * Handles product creation, including image upload to Cloudinary and
+ * saving product data to MongoDB.
+ *
+ * @param {import('next/server').NextRequest} request - The incoming Next.js request object.
+ * @returns {Promise<import('next/server').NextResponse>} - The Next.js response object.
+ */
 export async function POST(request) {
     const cookieStore = await cookies();
-    const token = cookieStore.get('jwt'); // আপনার কুকির নাম
+    const token = cookieStore.get('jwt'); // 'jwt' নামের কুকি থেকে টোকেন নেওয়া হচ্ছে
 
-    // 1. টোকেন আছে কিনা চেক করুন
+    // ১. টোকেন আছে কিনা চেক করুন
     if (!token) {
         return NextResponse.json({ message: 'Authentication required' }, { status: 401 });
     }
 
     let decoded;
     try {
-        // 2. টোকেন ভেরিফাই করুন। verifyToken যদি একটি async ফাংশন হয়, তাহলে await ব্যবহার করতে হবে।
+        // ২. টোকেন ভেরিফাই করুন। verifyToken যদি একটি async ফাংশন হয়, তাহলে await ব্যবহার করতে হবে।
         decoded = await verifyToken(token.value);
         // console.log('API POST - Decoded Token:', decoded); // ডিবাগিংয়ের জন্য
     } catch (error) {
@@ -88,22 +97,37 @@ export async function POST(request) {
         return NextResponse.json({ message: 'Invalid or expired token' }, { status: 401 });
     }
 
-    // 3. রোল চেক করুন (উদাহরণস্বরূপ, শুধু অ্যাডমিনরা প্রোডাক্ট তৈরি করতে পারবে)
+    // ৩. রোল চেক করুন (উদাহরণস্বরূপ, শুধু অ্যাডমিনরা প্রোডাক্ট তৈরি করতে পারবে)
+    // আপনার JWT টোকেনে 'role' ফিল্ড আছে ধরে নেওয়া হচ্ছে।
     if (decoded.role !== 'admin') {
         return NextResponse.json({ message: 'Access forbidden: Admin privilege required' }, { status: 403 });
     }
 
-    // 4. যদি সব চেক পাস করে, তাহলে ডেটা প্রসেস করুন
+    // ৪. যদি সব চেক পাস করে, তাহলে ডেটা প্রসেস করুন
     try {
-        // রিকোয়েস্ট বডি থেকে JSON ডেটা পার্স করা হচ্ছে।
-        const { name, title, category, description } = await request.json();
+        // FormData থেকে সরাসরি ডেটা পার্স করুন Next.js এর request.formData() ব্যবহার করে
+        const formData = await request.formData();
 
-        // console.log(name, title, category, description); // ডিবাগিংয়ের জন্য
+        // FormData থেকে ফিল্ডগুলো নিন
+        const name = formData.get('name');
+        const title = formData.get('title');
+        const category = formData.get('category');
+        const description = formData.get('description');
+        const price = formData.get('price');
+        const productImage = formData.get('productImage'); // ফাইল অবজেক্ট
 
         // প্রয়োজনীয় ফিল্ডগুলো আছে কিনা তা যাচাই করুন।
-        if (!name || !title || !category || !description) {
-            return NextResponse.json({ message: 'All fields (name, title, category, description) are required.' }, { status: 400 }); // 400 Bad Request
+        // productImage একটি File অবজেক্ট হওয়া উচিত, তাই এটি null বা undefined হবে না যদি ফাইল আপলোড করা হয়।
+        if (!name || !title || !category || !description || !price || !productImage) {
+            return NextResponse.json({ message: 'All fields (name, title, category, description, price, productImage) are required.' }, { status: 400 }); // 400 Bad Request
         }
+
+        // productImage (File অবজেক্ট) থেকে বাফার এবং ফাইলের নাম নিন
+        const imageBuffer = Buffer.from(await productImage.arrayBuffer());
+        const imageName = productImage.name;
+
+        // Cloudinary-তে ছবি আপলোড করুন
+        const imageUrl = await uploadImageToCloudinary(imageBuffer, imageName);
 
         // MongoDB ক্লায়েন্টের সাথে সংযোগ স্থাপন করুন।
         const client = await clientPromise;
@@ -116,6 +140,8 @@ export async function POST(request) {
             title,
             category,
             description,
+            price: parseFloat(price), // price কে number এ রূপান্তর করুন
+            productImage: imageUrl, // Cloudinary থেকে প্রাপ্ত URL
             createdAt: new Date(), // প্রোডাক্ট তৈরির সময়
             updatedAt: new Date(), // শেষ আপডেটের সময়
         };
@@ -139,3 +165,12 @@ export async function POST(request) {
         }, { status: 500 });
     }
 }
+
+// Multer আর ব্যবহার হচ্ছে না, তাই bodyParser: false এর প্রয়োজন নেই।
+// তবে, যদি অন্য কোনো কারণে bodyParser নিষ্ক্রিয় রাখতে চান, তাহলে রেখে দিতে পারেন।
+// এখানে এটি সরিয়ে দেওয়া হলো কারণ এটি আর Multer এর জন্য প্রয়োজনীয় নয়।
+// export const config = {
+//     api: {
+//         bodyParser: false,
+//     },
+// };
