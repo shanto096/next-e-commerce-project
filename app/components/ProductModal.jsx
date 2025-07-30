@@ -26,12 +26,9 @@ export default function ProductModal({ product, onClose }) {
           &times;
         </button>
         <h2 className="text-2xl font-bold mb-4">{product.name}</h2>
-        <img src={product.image} alt={product.name} className="w-64 h-64 object-contain mx-auto my-5" />
+        <img src={product.productImage} alt={product.name} className="w-64 h-64 object-contain mx-auto my-5" />
         <p className="text-gray-700 mb-2">{product.description}</p>
-        <p className="text-green-600 font-bold text-xl">${product.price.toFixed(2)}</p>
-        {product.oldPrice && (
-          <p className="text-gray-400 line-through">${product.oldPrice.toFixed(2)}</p>
-        )}
+        <p className="text-green-600 font-bold text-xl">${product.price}</p>
         <div className="text-yellow-500 mt-2">
           ★★★★☆ <span className="text-sm text-gray-600">({product.rating || 4.0})</span>
         </div>
