@@ -2,7 +2,25 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 
+const SeeProductModal = ({ isOpen, onClose, product }) => {
+  if (!isOpen || !product) return null;
 
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-300/50">
+      <div className="bg-white border-2 border-black p-6 rounded-lg shadow-lg w-full max-w-md">
+        <h2 className="text-xl font-semibold mb-4">Product Details</h2>
+        <img src={product.productImage} alt={product.name} className="w-full h-48 object-cover mb-4" />
+        <p><strong>Name:</strong> {product.name}</p>
+        <p><strong>Category:</strong> {product.category}</p>
+        <p><strong>Price:</strong> ${product.price}</p>
+        <p><strong>Description:</strong> {product.description}</p>
+        <div className="flex justify-end space-x-2">
+          <button className="px-4 py-2 rounded bg-red-500 hover:bg-red-600" onClick={onClose}>Close</button>
+        </div>
+      </div>
+    </div>
+  );
+};
 function CreateProductModal({ isOpen, onClose, onProductCreated }) {
   const [name, setName] = useState("");
   const [title, setTitle] = useState("");
@@ -262,8 +280,6 @@ function EditProductModal({ isOpen, onClose, product, onProductUpdated }) {
 }
 
 
-
-
 export default function ProductPage() {
   const { users } = useAuth();
   console.log(users);
@@ -276,6 +292,8 @@ export default function ProductPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const limit = 10;
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   const fetchProducts = async (pageNum = page) => {
     try {
@@ -331,6 +349,11 @@ export default function ProductPage() {
     fetchProducts(page);
   };
 
+  const handleView = (product) => {
+    setSelectedProduct(product);
+    setViewModalOpen(true);
+  };
+
   const handlePrev = () => {
     if (page > 1) setPage(page - 1);
   };
@@ -357,6 +380,11 @@ export default function ProductPage() {
         onClose={() => setEditModalOpen(false)}
         product={editingProduct}
         onProductUpdated={handleProductUpdated}
+      />
+      <SeeProductModal
+        isOpen={viewModalOpen}
+        onClose={() => setViewModalOpen(false)}
+        product={selectedProduct}
       />
       {loading && <p className="text-blue-500 text-lg animate-pulse">Loading...</p>}
       {error && <p className="text-red-500 text-lg">Error: {error.message}</p>}
@@ -387,6 +415,9 @@ export default function ProductPage() {
                   <button className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs" onClick={() => handleDelete(product._id)}>
                     Delete
                   </button>
+                  <button className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs" onClick={() => handleView(product)}>
+                    View
+                  </button> {/* New View button */}
                 </td>
               </tr>
             ))}
