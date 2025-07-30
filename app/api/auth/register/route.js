@@ -5,18 +5,19 @@ import bcrypt from 'bcryptjs'; // পাসওয়ার্ড হ্যাশ
 
 export async function POST(request) {
     try {
-        const { email, password } = await request.json();
+        // রিকোয়েস্ট বডি থেকে email, password এবং name গ্রহণ করুন
+        const { name, email, password } = await request.json();
 
-        // ইমেল এবং পাসওয়ার্ড আছে কিনা তা যাচাই করুন।
-        if (!email || !password) {
-            return NextResponse.json({ message: 'Email and password are required.' }, { status: 400 });
+        // নাম, ইমেল এবং পাসওয়ার্ড আছে কিনা তা যাচাই করুন।
+        if (!name || !email || !password) {
+            return NextResponse.json({ message: 'Name, email, and password are required.' }, { status: 400 });
         }
 
         const client = await clientPromise;
         const db = client.db("E-commerceDB"); // আপনার ডেটাবেসের নাম দিন
         const usersCollection = db.collection("users");
 
-        // ইউজারটি ইতিমধ্যে বিদ্যমান কিনা তা পরীক্ষা করুন।
+        // ইউজারটি ইতিমধ্যে বিদ্যমান কিনা তা পরীক্ষা করুন (ইমেল দিয়ে)।
         const existingUser = await usersCollection.findOne({ email });
         if (existingUser) {
             return NextResponse.json({ message: 'User with this email already exists.' }, { status: 409 }); // 409 Conflict
@@ -27,6 +28,7 @@ export async function POST(request) {
 
         // নতুন ইউজার তৈরি করুন এবং ডেটাবেসে সংরক্ষণ করুন।
         const result = await usersCollection.insertOne({
+            name, // নতুন যোগ করা হয়েছে
             email,
             password: hashedPassword,
             role: 'user',
@@ -36,6 +38,7 @@ export async function POST(request) {
         return NextResponse.json({
             message: 'User registered successfully!',
             userId: result.insertedId,
+            name: name, // প্রতিক্রিয়াতে নাম অন্তর্ভুক্ত করুন
             email: email
         }, { status: 201 }); // 201 Created
 

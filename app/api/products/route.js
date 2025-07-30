@@ -8,29 +8,6 @@ import { uploadImageToCloudinary } from '../../../lib/cloudinary'; // Cloudinary
 // GET রিকোয়েস্ট হ্যান্ডেল করার জন্য একটি অ্যাসিঙ্ক্রোনাস ফাংশন।
 // এই এপিআই /api/products পাথে অ্যাক্সেস করা যাবে এবং সমস্ত প্রোডাক্ট ডেটা ফিরিয়ে দেবে।
 export async function GET(request) {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('jwt'); // আপনার কুকির নাম
-
-    // 1. টোকেন আছে কিনা চেক করুন
-    if (!token) {
-        return NextResponse.json({ message: 'Authentication required' }, { status: 401 });
-    }
-
-    let decoded;
-    try {
-        // 2. টোকেন ভেরিফাই করুন। verifyToken যদি একটি async ফাংশন হয়, তাহলে await ব্যবহার করতে হবে।
-        decoded = await verifyToken(token.value);
-        // console.log('API GET - Decoded Token:', decoded); // ডিবাগিংয়ের জন্য
-    } catch (error) {
-        console.error('API GET - JWT verification failed:', error);
-        return NextResponse.json({ message: 'Invalid or expired token' }, { status: 401 });
-    }
-
-    // 3. রোল চেক করুন (উদাহরণস্বরূপ, শুধু অ্যাডমিনরা সব প্রোডাক্ট দেখতে পারবে)
-    // যদি এই API টি শুধুমাত্র অ্যাডমিনদের জন্য হয়:
-    if (decoded.role !== 'admin') {
-        return NextResponse.json({ message: 'Access forbidden: Admin privilege required' }, { status: 403 });
-    }
 
     // 4. যদি সব চেক পাস করে, তাহলে ডেটা প্রসেস করুন
     try {

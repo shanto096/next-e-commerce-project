@@ -5,11 +5,20 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 // রেজিস্ট্রেশন পেজ কম্পোনেন্ট
 export default function RegisterPage() {
+  const [name, setName] = useState(''); // নতুন নাম স্টেট
   const [email, setEmail] = useState(''); // ইমেল স্টেট
   const [password, setPassword] = useState(''); // পাসওয়ার্ড স্টেট
   const [message, setMessage] = useState(''); // মেসেজ স্টেট (সফলতা বা ত্রুটি বার্তা দেখানোর জন্য)
   const [loading, setLoading] = useState(false); // লোডিং স্টেট
   const router = useRouter();
+
+  // কাস্টম মেসেজ বক্স ফাংশন
+  const showMessage = (msg, type) => {
+    setMessage(msg);
+    // আপনি এখানে একটি কাস্টম মডেল বা টোস্ট নোটিফিকেশন ব্যবহার করতে পারেন
+    // আপাতত, এটি শুধু মেসেজ স্টেট সেট করবে
+  };
+
   // ফর্ম সাবমিট হ্যান্ডলার ফাংশন
   const handleSubmit = async (e) => {
     e.preventDefault(); // ফর্মের ডিফল্ট সাবমিট আচরণ বন্ধ করা
@@ -23,26 +32,28 @@ export default function RegisterPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }), // ইমেল এবং পাসওয়ার্ড JSON ফরম্যাটে পাঠানো
+        // নাম, ইমেল এবং পাসওয়ার্ড JSON ফরম্যাটে পাঠানো
+        body: JSON.stringify({ name, email, password }),
       });
 
       const data = await response.json(); // রেসপন্স JSON ফরম্যাটে পার্স করা
 
       if (response.ok) {
         // যদি রেসপন্স সফল হয় (স্ট্যাটাস 2xx)
-        setMessage(`Registration successful: ${data.message}. User ID: ${data.userId}`);
-        alert('Register Successfully');
+        showMessage(`Registration successful for ${data.name}! ${data.message}.`, 'success');
+        // alert('Register Successfully'); // alert() ব্যবহার করা এড়িয়ে চলুন
         setEmail(''); // ফর্ম পরিষ্কার করা
         setPassword(''); // ফর্ম পরিষ্কার করা
+        setName(''); // নাম ফিল্ড পরিষ্কার করা
         router.push('/login');
       } else {
         // যদি রেসপন্স ব্যর্থ হয় (স্ট্যাটাস 4xx বা 5xx)
-        setMessage(`Registration failed: ${data.message || 'Something went wrong.'}`);
+        showMessage(`Registration failed: ${data.message || 'Something went wrong.'}`, 'error');
       }
     } catch (error) {
       // নেটওয়ার্ক ত্রুটি বা অন্য কোনো ত্রুটি হলে
       console.error('Error during registration:', error);
-      setMessage('An error occurred. Please try again.');
+      showMessage('An error occurred. Please try again.', 'error');
     } finally {
       setLoading(false); // লোডিং শেষ
     }
@@ -53,6 +64,19 @@ export default function RegisterPage() {
       <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">রেজিস্টার করুন</h2>
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* নাম ইনপুট ফিল্ড */}
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">নাম:</label>
+            <input
+              type="text"
+              id="name"
+              className="mt-1 block w-full px-4 py-2 border text-black border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              disabled={loading}
+            />
+          </div>
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">ইমেল:</label>
             <input
@@ -70,7 +94,7 @@ export default function RegisterPage() {
             <input
               type="password"
               id="password"
-              className="mt-1 block w-full px-4 py-2 border  text-black border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              className="mt-1 block w-full px-4 py-2 border text-black border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
