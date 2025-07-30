@@ -364,20 +364,22 @@ export default function ProductPage() {
         <table className="min-w-full table-auto text-sm text-left text-gray-700">
           <thead className="bg-gray-200 text-gray-600 uppercase text-xs">
             <tr>
+              <th className="px-6 py-3">Image</th> {/* Column for images */}
               <th className="px-6 py-3">Name</th>
-              <th className="px-6 py-3">Title</th>
               <th className="px-6 py-3">Category</th>
-              <th className="px-6 py-3">Description</th>
+              <th className="px-6 py-3">Price</th> {/* New column for price */}
               <th className="px-6 py-3">Action</th>
             </tr>
           </thead>
           <tbody>
             {products?.map((product) => (
               <tr key={product._id} className="border-b hover:bg-gray-50 transition duration-200">
+                <td className="px-6 py-4">
+                  <img src={product.productImage} alt={product.name} className="w-16 h-16 object-cover" /> {/* Displaying the image */}
+                </td>
                 <td className="px-6 py-4 font-medium">{product.name}</td>
-                <td className="px-6 py-4">{product.title}</td>
                 <td className="px-6 py-4">{product.category}</td>
-                <td className="px-6 py-4">{product.description}</td>
+                <td className="px-6 py-4">{product.price}</td> {/* Displaying the price */}
                 <td className="px-6 py-4 space-x-2">
                   <button className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs" onClick={() => handleEdit(product)}>
                     Edit
