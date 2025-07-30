@@ -407,7 +407,7 @@ export default function ProductPage() {
                 </td>
                 <td className="px-6 py-4 font-medium">{product.name}</td>
                 <td className="px-6 py-4">{product.category}</td>
-                <td className="px-6 py-4">{product.price}</td> {/* Displaying the price */}
+                <td className="px-6 py-4">$ {product.price}</td> {/* Displaying the price */}
                 <td className="px-6 py-4 space-x-2">
                   <button className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs" onClick={() => handleEdit(product)}>
                     Edit
