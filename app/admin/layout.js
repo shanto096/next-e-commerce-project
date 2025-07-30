@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { verifyToken } from "../../lib/jwt"; // নিশ্চিত করুন যে 'jwt' ফাইলটি আপনার JWT ভেরিফিকেশন লজিক ধারণ করে।
 import { redirect } from 'next/navigation';
 import Sidebar from '../components/Sidebar'
+import DashboardNavbar from '../components/DashboardNavbar'
 
 
 
@@ -38,11 +39,16 @@ export default async function AdminLayout({ children }) { // async কিওয�
 
   // 5. যদি সব চেক পাস করে, তাহলে অ্যাডমিন প্যানেলের কন্টেন্ট দেখান।
   return (
-    <div className="flex min-h-screen">
+    <>
+    <div className="">
+    <DashboardNavbar/>
+    <div className="flex min-h-screen  ">
       <aside className="w-56 bg-gray-100 p-6">
        <Sidebar/>
       </aside>
       <main className="flex-1 p-8">{children}</main>
     </div>
+    </div>
+    </>
   );
 }

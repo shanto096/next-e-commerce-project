@@ -6,15 +6,13 @@ const sidebarItems = [
   { name: "Dashboard", href: "/admin/dashboard" },
   { name: "User", href: "/admin/user" },
   { name: "Products", href: "/admin/products" },
+  { name: "Website", href: "/" },
 ];
 const Sidebar = () => {
     const {user} = useAuth()
 
   return (
     <div>
-        <div className="bg-amber-200 rounded-md p-4">
-            <h1>{user?.email}</h1>
-        </div>
       <nav>
         <ul className="list-none p-0">
           {sidebarItems.map((item) => (
