@@ -122,11 +122,6 @@ function CreateProductModal({ isOpen, onClose, onProductCreated }) {
   );
 }
 
-
-
-
-
-
 function EditProductModal({ isOpen, onClose, product, onProductUpdated }) {
   const [name, setName] = useState("");
   const [title, setTitle] = useState("");
@@ -279,7 +274,6 @@ function EditProductModal({ isOpen, onClose, product, onProductUpdated }) {
   );
 }
 
-
 export default function ProductPage() {
   const { users } = useAuth();
   console.log(users);
@@ -295,10 +289,16 @@ export default function ProductPage() {
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-  const fetchProducts = async (pageNum = page) => {
+  // State for search and category filter
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All"); // Default to 'All' categories
+
+  const fetchProducts = async (pageNum = page, search = searchQuery, category = selectedCategory) => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/products?page=${pageNum}&limit=${limit}`);
+      // Construct the URL with search and category parameters
+      const url = `/api/products?page=${pageNum}&limit=${limit}&search=${search}&category=${category}`;
+      const response = await fetch(url);
       const data = await response.json();
       setProducts(data.data);
       setTotalPages(data.totalPages || 1);
@@ -310,12 +310,12 @@ export default function ProductPage() {
   };
 
   useEffect(() => {
-    fetchProducts(page);
+    fetchProducts(page, searchQuery, selectedCategory);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page]);
+  }, [page, searchQuery, selectedCategory]); // Refetch when page, search, or category changes
 
   const handleProductCreated = () => {
-    fetchProducts(page);
+    fetchProducts(page, searchQuery, selectedCategory);
   };
 
   const handleDelete = async (id) => {
@@ -331,7 +331,7 @@ export default function ProductPage() {
       if (products.length === 1 && page > 1) {
         setPage(page - 1);
       } else {
-        fetchProducts(page);
+        fetchProducts(page, searchQuery, selectedCategory);
       }
     } catch (err) {
       setError(err);
@@ -346,7 +346,7 @@ export default function ProductPage() {
   };
 
   const handleProductUpdated = () => {
-    fetchProducts(page);
+    fetchProducts(page, searchQuery, selectedCategory);
   };
 
   const handleView = (product) => {
@@ -361,6 +361,20 @@ export default function ProductPage() {
     if (page < totalPages) setPage(page + 1);
   };
 
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+    setPage(1); // Reset to first page on new search
+  };
+
+  // Handle category select change
+  const handleCategoryChange = (e) => {
+    setSelectedCategory(e.target.value);
+    setPage(1); // Reset to first page on new category filter
+  };
+
+  const productCategories = ["All", "Vegetables", "Fruits", "Bread", "Meat"]; // Define your categories here
+
   return (
     <div className="p-6 min-h-screen">
       <h1 className="text-2xl font-semibold mb-4">Admin Product Management ({products?.length || 0})</h1>
@@ -370,6 +384,30 @@ export default function ProductPage() {
       >
         + Create Product
       </button>
+
+      {/* Search and Filter Section */}
+      <div className="mb-4 flex space-x-4">
+        <input
+          type="text"
+          placeholder="Search by product name..."
+          className="w-1/2 border px-3 py-2 rounded shadow-sm"
+          value={searchQuery}
+          onChange={handleSearchChange}
+        />
+        <select
+          className="w-1/4 border px-3 py-2 rounded shadow-sm"
+          value={selectedCategory}
+          onChange={handleCategoryChange}
+        >
+          {productCategories.map((category) => (
+            <option key={category} value={category}>
+              {category}
+            </option>
+          ))}
+        </select>
+      </div>
+      {/* End Search and Filter Section */}
+
       <CreateProductModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -392,10 +430,10 @@ export default function ProductPage() {
         <table className="min-w-full table-auto text-sm text-left text-gray-700">
           <thead className="bg-gray-200 text-gray-600 uppercase text-xs">
             <tr>
-              <th className="px-6 py-3">Image</th> {/* Column for images */}
+              <th className="px-6 py-3">Image</th>
               <th className="px-6 py-3">Name</th>
               <th className="px-6 py-3">Category</th>
-              <th className="px-6 py-3">Price</th> {/* New column for price */}
+              <th className="px-6 py-3">Price</th>
               <th className="px-6 py-3">Action</th>
             </tr>
           </thead>
@@ -403,11 +441,11 @@ export default function ProductPage() {
             {products?.map((product) => (
               <tr key={product._id} className="border-b hover:bg-gray-50 transition duration-200">
                 <td className="px-6 py-4">
-                  <img src={product.productImage} alt={product.name} className="w-16 h-16 object-cover" /> {/* Displaying the image */}
+                  <img src={product.productImage} alt={product.name} className="w-16 h-16 object-cover" />
                 </td>
                 <td className="px-6 py-4 font-medium">{product.name}</td>
                 <td className="px-6 py-4">{product.category}</td>
-                <td className="px-6 py-4">$ {product.price}</td> {/* Displaying the price */}
+                <td className="px-6 py-4">$ {product.price}</td>
                 <td className="px-6 py-4 space-x-2">
                   <button className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs" onClick={() => handleEdit(product)}>
                     Edit
@@ -417,7 +455,7 @@ export default function ProductPage() {
                   </button>
                   <button className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs" onClick={() => handleView(product)}>
                     View
-                  </button> {/* New View button */}
+                  </button>
                 </td>
               </tr>
             ))}
