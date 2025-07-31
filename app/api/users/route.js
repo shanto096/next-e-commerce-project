@@ -2,10 +2,33 @@
 import clientPromise from '../../../lib/mongodb';
 import { NextResponse } from 'next/server';
 import { ObjectId } from 'mongodb';
+import { verifyToken } from '../../../lib/jwt';
+import { cookies } from 'next/headers';
 
 // GET রিকোয়েস্ট হ্যান্ডেল করার জন্য একটি অ্যাসিঙ্ক্রোনাস ফাংশন।
 // এই এপিআই /api/users পাথে অ্যাক্সেস করা যাবে এবং সমস্ত ইউজার ডেটা ফিরিয়ে দেবে।
 export async function GET(request) {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('jwt'); // 'jwt' নামের কুকি থেকে টোকেন নেওয়া হচ্ছে
+
+    // ১. টোকেন আছে কিনা চেক করুন
+    if (!token) {
+        return NextResponse.json({ message: 'Authentication required' }, { status: 401 });
+    }
+
+    let decoded;
+    try {
+        // ২. টোকেন ভেরিফাই করুন।
+        decoded = await verifyToken(token.value);
+    } catch (error) {
+        console.error('API PUT - JWT verification failed:', error);
+        return NextResponse.json({ message: 'Invalid or expired token' }, { status: 401 });
+    }
+
+    // ৩. রোল চেক করুন (উদাহরণস্বরূপ, শুধু অ্যাডমিনরা প্রোডাক্ট আপডেট করতে পারবে)
+    if (decoded?.role !== 'admin') {
+        return NextResponse.json({ message: 'Access forbidden: Admin privilege required' }, { status: 403 });
+    }
     try {
         const { searchParams } = new URL(request.url);
         const page = parseInt(searchParams.get('page')) || 1;
@@ -42,41 +65,7 @@ export async function GET(request) {
     }
 }
 
-// POST রিকোয়েস্ট হ্যান্ডেল করার জন্য একটি অ্যাসিঙ্ক্রোনাস ফাংশন।
-// এই এপিআই /api/users পাথে অ্যাক্সেস করা যাবে এবং নতুন ইউজার ডেটা ডেটাবেসে যোগ করবে।
-export async function POST(request) {
-    try {
-        // রিকোয়েস্ট বডি থেকে JSON ডেটা পার্স করা হচ্ছে।
-        const { email, password } = await request.json();
 
-        // যদি নাম বা ইমেল না থাকে, তাহলে 400 (Bad Request) ত্রুটি ফিরিয়ে দিন।
-        if (!email || !password) {
-            return NextResponse.json({ message: 'Email and password are required.' }, { status: 400 });
-        }
-
-        // MongoDB ক্লায়েন্টের সাথে সংযোগ স্থাপন করুন।
-        const client = await clientPromise;
-        const db = client.db("E-commerceDB"); // আপনার ডেটাবেসের নাম দিন
-
-        // 'users' কালেকশনে নতুন ডকুমেন্ট যোগ করুন।
-        const result = await db.collection("users").insertOne({ email, password, role: 'user', createdAt: new Date() });
-
-        // সফল JSON রেসপন্স ফিরিয়ে দিন।
-        return NextResponse.json({
-            message: 'User added successfully!',
-            userId: result.insertedId, // নতুন যোগ করা ইউজারের ID
-            data: { email, password, role: 'user' }
-        }, { status: 201 }); // 201 Created স্ট্যাটাস কোড
-
-    } catch (error) {
-        // কোনো ত্রুটি হলে 500 (Internal Server Error) স্ট্যাটাস কোড সহ রেসপন্স পাঠানো হচ্ছে।
-        console.error('Error adding user:', error);
-        return NextResponse.json({
-            message: 'Error adding user.',
-            error: error.message
-        }, { status: 500 });
-    }
-}
 
 // আপনি চাইলে অন্যান্য HTTP মেথড যেমন PUT, DELETE ইত্যাদিও এখানে হ্যান্ডেল করতে পারেন।
 export async function PUT(request) {
