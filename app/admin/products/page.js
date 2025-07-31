@@ -139,6 +139,7 @@ function EditProductModal({ isOpen, onClose, product, onProductUpdated }) {
       setCategory(product.category || "");
       setDescription(product.description || "");
       setPrice(product.price || "");
+      setProductImage(product.productImage||"")
     }
   }, [product]);
 
@@ -242,7 +243,10 @@ function EditProductModal({ isOpen, onClose, product, onProductUpdated }) {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1 ">Image (optional)</label>
+            <label className="block text-sm font-medium mb-1">Image (optional)</label>
+            {productImage&& (
+                <img src={productImage} alt="Current News Image" className="w-24 h-24 object-cover mb-2 rounded" />
+            )}
             <input
               type="file"
               accept="image/*"

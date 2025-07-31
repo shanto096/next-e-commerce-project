@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { verifyToken } from '../../../lib/jwt';
 import clientPromise from '../../../lib/mongodb';
 import { uploadImageToCloudinary } from '../../../lib/cloudinary';
+import { checkAuthAndAdmin } from '../../../lib/checkAuthAndAdmin';
 
 export async function GET(request) {
     try {
@@ -55,23 +54,9 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('jwt');
-
-    if (!token) {
-        return NextResponse.json({ message: 'Authentication required' }, { status: 401 });
-    }
-
-    let decoded;
-    try {
-        decoded = await verifyToken(token.value);
-    } catch (error) {
-        console.error('API POST - JWT verification failed:', error);
-        return NextResponse.json({ message: 'Invalid or expired token' }, { status: 401 });
-    }
-
-    if (decoded.role !== 'admin') {
-        return NextResponse.json({ message: 'Access forbidden: Admin privilege required' }, { status: 403 });
+    const authResult = await checkAuthAndAdmin();
+    if (!authResult.authorized) {
+        return NextResponse.json({ message: authResult.message }, { status: authResult.status });
     }
 
     try {

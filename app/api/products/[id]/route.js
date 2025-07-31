@@ -4,8 +4,7 @@ import { NextResponse } from 'next/server';
 import { ObjectId } from 'mongodb'; // ObjectId ইম্পোর্ট করুন ID দ্বারা খোঁজার জন্য
 import { uploadImageToCloudinary, deleteImageFromCloudinary } from '../../../../lib/cloudinary'; // Cloudinary আপলোড ও ডিলিট ইউটিলিটি
 import clientPromise from '../../../../lib/mongodb';
-import { verifyToken } from '../../../../lib/jwt';
-import { cookies } from 'next/headers';
+import { checkAuthAndAdmin } from '@/lib/checkAuthAndAdmin';
 
 // GET রিকোয়েস্ট হ্যান্ডেল করার জন্য একটি অ্যাসিঙ্ক্রোনাস ফাংশন।
 // এই এপিআই /api/products/[id] পাথে অ্যাক্সেস করা যাবে এবং একটি নির্দিষ্ট প্রোডাক্ট ফিরিয়ে দেবে।
@@ -56,26 +55,9 @@ export async function GET(request, { params }) {
  * @returns {Promise<import('next/server').NextResponse>} - The Next.js response object.
  */
 export async function PUT(request, { params }) {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('jwt'); // 'jwt' নামের কুকি থেকে টোকেন নেওয়া হচ্ছে
-
-    // ১. টোকেন আছে কিনা চেক করুন
-    if (!token) {
-        return NextResponse.json({ message: 'Authentication required' }, { status: 401 });
-    }
-
-    let decoded;
-    try {
-        // ২. টোকেন ভেরিফাই করুন।
-        decoded = await verifyToken(token.value);
-    } catch (error) {
-        console.error('API PUT - JWT verification failed:', error);
-        return NextResponse.json({ message: 'Invalid or expired token' }, { status: 401 });
-    }
-
-    // ৩. রোল চেক করুন (উদাহরণস্বরূপ, শুধু অ্যাডমিনরা প্রোডাক্ট আপডেট করতে পারবে)
-    if (decoded.role !== 'admin') {
-        return NextResponse.json({ message: 'Access forbidden: Admin privilege required' }, { status: 403 });
+    const authResult = await checkAuthAndAdmin();
+    if (!authResult.authorized) {
+        return NextResponse.json({ message: authResult.message }, { status: authResult.status });
     }
 
     try {
@@ -162,28 +144,10 @@ export async function PUT(request, { params }) {
  * @returns {Promise<import('next/server').NextResponse>} - The Next.js response object.
  */
 export async function DELETE(request, { params }) {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('jwt');
-
-    // ১. টোকেন আছে কিনা চেক করুন
-    if (!token) {
-        return NextResponse.json({ message: 'Authentication required' }, { status: 401 });
+    const authResult = await checkAuthAndAdmin();
+    if (!authResult.authorized) {
+        return NextResponse.json({ message: authResult.message }, { status: authResult.status });
     }
-
-    let decoded;
-    try {
-        // ২. টোকেন ভেরিফাই করুন।
-        decoded = await verifyToken(token.value);
-    } catch (error) {
-        console.error('API DELETE - JWT verification failed:', error);
-        return NextResponse.json({ message: 'Invalid or expired token' }, { status: 401 });
-    }
-
-    // ৩. রোল চেক করুন (উদাহরণস্বরূপ, শুধু অ্যাডমিনরা প্রোডাক্ট ডিলিট করতে পারবে)
-    if (decoded.role !== 'admin') {
-        return NextResponse.json({ message: 'Access forbidden: Admin privilege required' }, { status: 403 });
-    }
-
     try {
         const { id } = await params;
 
