@@ -1,22 +1,18 @@
 import { NextResponse } from 'next/server';
 import { ObjectId } from 'mongodb';
-import { cookies } from 'next/headers';
-import { verifyToken } from '../../../../lib/jwt';
+// Make sure this path is correct
 import clientPromise from '../../../../lib/mongodb';
-import checkAuthAndAdmin from '../../../../lib/checkAuthAndAdmin';
 // Make sure these are properly implemented in your lib/cloudinary.js
 import { uploadImageToCloudinary, deleteImageFromCloudinary } from '../../../../lib/cloudinary';
+import { checkAuthAndAdmin } from '../../../../lib/checkAuthAndAdmin';
 
 
 
 // GET request handler to fetch a single news article by ID
 export async function GET(request, { params }) {
-    const authResult = await checkAuthAndAdmin();
-    if (!authResult.authorized) {
-        return NextResponse.json({ message: authResult.message }, { status: authResult.status });
-    }
+
     try {
-        const { id } = await params;
+        const { id } = await params; // No need for 'await params'
         if (!ObjectId.isValid(id)) {
             return NextResponse.json({ message: 'Invalid News ID' }, { status: 400 });
         }
@@ -53,7 +49,7 @@ export async function PUT(request, { params }) {
     }
 
     try {
-        const { id } = await params;
+        const { id } = await params; // No need for 'await params'
         if (!ObjectId.isValid(id)) {
             return NextResponse.json({ message: 'Invalid News ID' }, { status: 400 });
         }
@@ -62,9 +58,15 @@ export async function PUT(request, { params }) {
         const title = formData.get('title');
         const description = formData.get('description');
         const newsImage = formData.get('newsImage'); // This will be a File object if updated, or null/undefined if not
+        const status = formData.get('status'); // New: Get status from form
 
-        if (!title || !description) {
-            return NextResponse.json({ message: 'Title and description are required.' }, { status: 400 });
+        // Now status is required for PUT operations
+        if (!title || !description || !status) {
+            return NextResponse.json({ message: 'Title, description, and status are required.' }, { status: 400 });
+        }
+        // Validate status explicitly if you only allow 'active' or 'not active'
+        if (status !== 'active' && status !== 'not active') {
+            return NextResponse.json({ message: 'Invalid status provided. Must be "active" or "not active".' }, { status: 400 });
         }
 
         const client = await clientPromise;
@@ -74,6 +76,7 @@ export async function PUT(request, { params }) {
         const updateData = {
             title,
             description,
+            status, // Update the status
             updatedAt: new Date(),
         };
 
@@ -120,7 +123,7 @@ export async function DELETE(request, { params }) {
     }
 
     try {
-        const { id } = params;
+        const { id } = await params;
         if (!ObjectId.isValid(id)) {
             return NextResponse.json({ message: 'Invalid News ID' }, { status: 400 });
         }

@@ -13,8 +13,9 @@ const SeeNewsModal = ({ isOpen, onClose, newsArticle }) => {
         <img src={newsArticle.image} alt={newsArticle.title} className="w-full h-48 object-cover mb-4" />
         <p><strong>Title:</strong> {newsArticle.title}</p>
         <p><strong>Description:</strong> {newsArticle.description}</p>
+        <p><strong>Status:</strong> <span className={`font-semibold ${newsArticle.status === 'active' ? 'text-green-600' : 'text-red-600'}`}>{newsArticle.status.toUpperCase()}</span></p>
         <p><strong>Created At:</strong> {new Date(newsArticle.createdAt).toLocaleString()}</p>
-        <div className="flex justify-end space-x-2">
+        <div className="flex justify-end space-x-2 mt-4">
           <button className="px-4 py-2 rounded bg-red-500 hover:bg-red-600 text-white" onClick={onClose}>Close</button>
         </div>
       </div>
@@ -26,6 +27,7 @@ function CreateNewsModal({ isOpen, onClose, onNewsCreated }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [newsImage, setNewsImage] = useState(null);
+  const [status, setStatus] = useState("active"); // New state for status, default to 'active'
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -43,8 +45,9 @@ function CreateNewsModal({ isOpen, onClose, onNewsCreated }) {
       formData.append("title", title);
       formData.append("description", description);
       formData.append("newsImage", newsImage);
+      formData.append("status", status); // Append status to form data
 
-      const res = await fetch("/api/recent-news", {
+      const res = await fetch("/api/recent-news", { // Changed to /api/news as per previous routes
         method: "POST",
         body: formData,
       });
@@ -56,6 +59,7 @@ function CreateNewsModal({ isOpen, onClose, onNewsCreated }) {
       setTitle("");
       setDescription("");
       setNewsImage(null);
+      setStatus("active"); // Reset status to default
       onNewsCreated();
       onClose();
     } catch (err) {
@@ -84,6 +88,18 @@ function CreateNewsModal({ isOpen, onClose, onNewsCreated }) {
             <label className="block text-sm font-medium mb-1">News Image</label>
             <input type="file" accept="image/*" className="w-full" onChange={handleImageChange} required />
           </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Status</label>
+            <select
+              className="w-full border px-3 py-2 rounded"
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              required
+            >
+              <option value="active">Active</option>
+              <option value="not active">Not Active</option>
+            </select>
+          </div>
           {error && <p className="text-red-500 text-sm">{error.message}</p>}
           <div className="flex justify-end space-x-2">
             <button type="button" className="px-4 py-2 rounded bg-red-500 hover:bg-red-600 text-white" onClick={onClose} disabled={loading}>Cancel</button>
@@ -101,6 +117,7 @@ function EditNewsModal({ isOpen, onClose, newsArticle, onNewsUpdated }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [newsImage, setNewsImage] = useState(null); // For new image upload
+  const [status, setStatus] = useState(""); // State for status
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -108,6 +125,7 @@ function EditNewsModal({ isOpen, onClose, newsArticle, onNewsUpdated }) {
     if (newsArticle) {
       setTitle(newsArticle.title || "");
       setDescription(newsArticle.description || "");
+      setStatus(newsArticle.status || "active"); // Set initial status from newsArticle
       setNewsImage(null); // Clear previous image selection
     }
   }, [newsArticle]);
@@ -125,11 +143,12 @@ function EditNewsModal({ isOpen, onClose, newsArticle, onNewsUpdated }) {
       const formData = new FormData();
       formData.append("title", title);
       formData.append("description", description);
+      formData.append("status", status); // Append status to form data
       if (newsImage) {
         formData.append("newsImage", newsImage);
       }
 
-      const res = await fetch(`/api/recent-news/${newsArticle._id}`, {
+      const res = await fetch(`/api/recent-news/${newsArticle._id}`, { // Changed to /api/news as per previous routes
         method: "PUT",
         body: formData,
       });
@@ -171,6 +190,18 @@ function EditNewsModal({ isOpen, onClose, newsArticle, onNewsUpdated }) {
               onChange={(e) => setDescription(e.target.value)}
               required
             />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Status</label>
+            <select
+              className="w-full border px-3 py-2 rounded"
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              required
+            >
+              <option value="active">Active</option>
+              <option value="not active">Not Active</option>
+            </select>
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Image (optional)</label>
@@ -222,11 +253,13 @@ export default function AdminNewsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const limit = 10;
   const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState(""); // New state for status filter
 
-  const fetchNews = async (pageNum = page, search = searchQuery) => {
+  const fetchNews = async (pageNum = page, search = searchQuery, status = statusFilter) => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/recent-news?page=${pageNum}&limit=${limit}&search=${search}`);
+      const url = `/api/recent-news?page=${pageNum}&limit=${limit}&search=${search}${status ? `&status=${status}` : ''}`;
+      const response = await fetch(url);
       const data = await response.json();
       setNews(data.data);
       setTotalPages(data.totalPages || 1);
@@ -238,19 +271,19 @@ export default function AdminNewsPage() {
   };
 
   useEffect(() => {
-    fetchNews(page, searchQuery);
+    fetchNews(page, searchQuery, statusFilter);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, searchQuery]);
+  }, [page, searchQuery, statusFilter]); // Add statusFilter to dependencies
 
   const handleNewsCreated = () => {
-    fetchNews(page, searchQuery);
+    fetchNews(page, searchQuery, statusFilter);
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this news article?")) return;
     try {
       setLoading(true);
-      const res = await fetch(`/api/news/${id}`, {
+      const res = await fetch(`/api/recent-news/${id}`, {
         method: "DELETE",
       });
       const data = await res.json();
@@ -259,7 +292,7 @@ export default function AdminNewsPage() {
       if (news.length === 1 && page > 1) {
         setPage(page - 1);
       } else {
-        fetchNews(page, searchQuery);
+        fetchNews(page, searchQuery, statusFilter);
       }
     } catch (err) {
       setError(err);
@@ -274,7 +307,7 @@ export default function AdminNewsPage() {
   };
 
   const handleNewsUpdated = () => {
-    fetchNews(page, searchQuery);
+    fetchNews(page, searchQuery, statusFilter);
   };
 
   const handleView = (article) => {
@@ -292,6 +325,11 @@ export default function AdminNewsPage() {
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
     setPage(1); // Reset to first page on new search
+  };
+
+  const handleStatusFilterChange = (e) => {
+    setStatusFilter(e.target.value);
+    setPage(1); // Reset to first page on new filter
   };
 
   return (
@@ -320,15 +358,29 @@ export default function AdminNewsPage() {
         newsArticle={selectedNews}
       />
 
-      {/* Search Bar */}
-      <div className="mb-4">
-        <input
-          type="text"
-          placeholder="Search news by title..."
-          className="w-full border px-3 py-2 rounded shadow-sm"
-          value={searchQuery}
-          onChange={handleSearchChange}
-        />
+      <div className="flex flex-col sm:flex-row gap-4 mb-4">
+        {/* Search Bar */}
+        <div className="flex-1">
+          <input
+            type="text"
+            placeholder="Search news by title..."
+            className="w-full border px-3 py-2 rounded shadow-sm"
+            value={searchQuery}
+            onChange={handleSearchChange}
+          />
+        </div>
+        {/* Status Filter */}
+        <div className="w-full sm:w-auto">
+          <select
+            className="w-full border px-3 py-2 rounded shadow-sm bg-white"
+            value={statusFilter}
+            onChange={handleStatusFilterChange}
+          >
+            <option value="">All Statuses</option>
+            <option value="active">Active</option>
+            <option value="not active">Not Active</option>
+          </select>
+        </div>
       </div>
 
       {loading && <p className="text-blue-500 text-lg animate-pulse">Loading...</p>}
@@ -340,6 +392,7 @@ export default function AdminNewsPage() {
               <th className="px-6 py-3">Image</th>
               <th className="px-6 py-3">Title</th>
               <th className="px-6 py-3">Description</th>
+              <th className="px-6 py-3">Status</th> {/* New column for status */}
               <th className="px-6 py-3">Action</th>
             </tr>
           </thead>
@@ -350,7 +403,12 @@ export default function AdminNewsPage() {
                   <img src={article.image} alt={article.title} className="w-16 h-16 object-cover rounded" />
                 </td>
                 <td className="px-6 py-4 font-medium">{article.title}</td>
-                <td className="px-6 py-4 truncate max-w-xs">{article.description}</td> {/* Truncate long descriptions */}
+                <td className="px-6 py-4 truncate max-w-xs">{article.description}</td>
+                <td className="px-6 py-4">
+                  <span className={`font-semibold ${article.status === 'active' ? 'text-green-600' : 'text-red-600'}`}>
+                    {article.status ? article.status.toUpperCase() : 'N/A'}
+                  </span>
+                </td> {/* Display status */}
                 <td className="px-6 py-4 space-x-2">
                   <button className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs" onClick={() => handleEdit(article)}>
                     Edit
