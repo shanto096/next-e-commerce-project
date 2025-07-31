@@ -2,18 +2,16 @@
 
 import ProductCard from './ProductCard';
 
+export default function ProductList({ products }) { // Removed selectedCategory prop
 
-export default function ProductList({products, selectedCategory }) {
-
-  
-  
-  const filtered = selectedCategory === "All"
-    ? products
-    : products.filter(p => p.category === selectedCategory);
+  // products prop will already be filtered and paginated from HomePage
+  if (!products || products.length === 0) {
+    return null; // Or show a message like "No products to display"
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {filtered.map(product => (
+      {products.map(product => (
         <ProductCard key={product._id} product={product} />
       ))}
     </div>
