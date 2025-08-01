@@ -68,27 +68,6 @@ export async function GET(request) {
 
 
 // আপনি চাইলে অন্যান্য HTTP মেথড যেমন PUT, DELETE ইত্যাদিও এখানে হ্যান্ডেল করতে পারেন।
-export async function PUT(request) {
-    try {
-        const { id, name, email } = await request.json();
-        if (!id || (!name && !email)) {
-            return NextResponse.json({ message: 'User ID and at least one field (name or email) required.' }, { status: 400 });
-        }
-        const client = await clientPromise;
-        const db = client.db("E-commerceDB");
-        const update = {};
-        if (name) update.name = name;
-        if (email) update.email = email;
-        const result = await db.collection("users").updateOne({ _id: new ObjectId(id) }, { $set: update });
-        if (result.matchedCount === 0) {
-            return NextResponse.json({ message: 'User not found.' }, { status: 404 });
-        }
-        return NextResponse.json({ message: 'User updated successfully!' }, { status: 200 });
-    } catch (error) {
-        console.error('Error updating user:', error);
-        return NextResponse.json({ message: 'Error updating user.', error: error.message }, { status: 500 });
-    }
-}
 
 export async function DELETE(request) {
     try {
