@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 const products = [
   {
@@ -99,9 +100,11 @@ export default function TrendingProducts() {
           </motion.div>
         </div>
 
+       <Link href={'/products'}>
         <button className="mt-10 px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
           See all products
         </button>
+       </Link>
       </div>
     </section>
   );
