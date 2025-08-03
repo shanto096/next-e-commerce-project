@@ -2,18 +2,17 @@
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "../context/AuthContext"; // Assuming AuthContext provides user.name, user.email, user.role
+import { FaShoppingCart } from 'react-icons/fa'; // কার্ট আইকন ইম্পোর্ট করুন
 
 const Navbar = () => {
-  const { user, logout } = useAuth();
-  const [showUserModal, setShowUserModal] = useState(false); // State to control user modal visibility
-  const modalRef = useRef(null); // Ref for the modal to detect clicks outside
+  const { user, logout, cartCount  } = useAuth();
+  const [showUserModal, setShowUserModal] = useState(false);
+  const modalRef = useRef(null);
 
-  // Function to toggle user modal visibility
   const toggleUserModal = () => {
     setShowUserModal(!showUserModal);
   };
 
-  // Effect to close modal when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (modalRef.current && !modalRef.current.contains(event.target)) {
@@ -21,11 +20,9 @@ const Navbar = () => {
       }
     };
 
-    // Add event listener when modal is open
     if (showUserModal) {
       document.addEventListener("mousedown", handleClickOutside);
     } else {
-      // Clean up event listener when modal is closed
       document.removeEventListener("mousedown", handleClickOutside);
     }
 
@@ -50,7 +47,19 @@ const Navbar = () => {
         <li><Link href="/products" className="text-gray-300 hover:text-white transition duration-300 text-lg">Products</Link></li>
         <li><Link href="/about" className="text-gray-300 hover:text-white transition duration-300 text-lg">About</Link></li>
         <li><Link href="/contact" className="text-gray-300 hover:text-white transition duration-300 text-lg">Contact</Link></li>
-        <li><Link href="/cart" className="text-gray-300 hover:text-white transition duration-300 text-lg">Cart</Link></li>
+        
+        {/* Cart Item with count badge */}
+        <li className="relative">
+          <Link href="/cart" className="flex items-center text-gray-300 hover:text-white transition duration-300 text-lg">
+            <FaShoppingCart className="mr-2" />
+            <span>Cart</span>
+            {cartCount > 0 && (
+              <span className="absolute -top-3 left-8 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                {cartCount}
+              </span>
+            )}
+          </Link>
+        </li>
 
         {/* Conditional rendering for authenticated vs. unauthenticated users */}
         {!user ? (
@@ -63,7 +72,7 @@ const Navbar = () => {
             {/* User Avatar and Name */}
             <button
               onClick={toggleUserModal}
-              className="flex items-center space-x-2 text-white  rounded-full p-1 transition duration-300 "
+              className="flex items-center space-x-2 text-white rounded-full p-1 transition duration-300"
             >
               {/* Simple SVG Avatar */}
               <svg
