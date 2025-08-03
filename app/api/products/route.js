@@ -1,15 +1,18 @@
 import { NextResponse } from 'next/server';
 import clientPromise from '../../../lib/mongodb';
-import { uploadImageToCloudinary } from '../../../lib/cloudinary';
+import { ObjectId } from 'mongodb'; // ObjectId ইম্পোর্ট করুন
+import { uploadImageToCloudinary, deleteImageFromCloudinary } from '../../../lib/cloudinary';
 import { checkAuthAndAdmin } from '../../../lib/checkAuthAndAdmin';
 
+// GET: পণ্য তালিকা আনা এবং ফিল্টার করা
 export async function GET(request) {
     try {
         const { searchParams } = new URL(request.url);
         const page = parseInt(searchParams.get('page')) || 1;
         const limit = parseInt(searchParams.get('limit')) || 10;
-        const searchQuery = searchParams.get('search') || ''; // Get search query
-        const categoryFilter = searchParams.get('category') || ''; // Get category filter
+        const searchQuery = searchParams.get('search') || '';
+        const categoryFilter = searchParams.get('category') || 'All';
+        const trendingStatus = searchParams.get('isTrending') || 'All'; // নতুন Trending Status ফিল্টার
         const skip = (page - 1) * limit;
 
         const client = await clientPromise;
@@ -18,14 +21,17 @@ export async function GET(request) {
 
         let query = {};
 
-        // If search query exists, add it to the query
         if (searchQuery) {
-            query.name = { $regex: searchQuery, $options: 'i' }; // Case-insensitive search by name
+            query.name = { $regex: searchQuery, $options: 'i' };
         }
 
-        // If category filter exists, add it to the query
-        if (categoryFilter && categoryFilter !== 'All') { // Assuming 'All' is used to show all categories
+        if (categoryFilter && categoryFilter !== 'All') {
             query.category = categoryFilter;
+        }
+
+        // নতুন Trending Status ফিল্টার লজিক যোগ করা হয়েছে
+        if (trendingStatus !== 'All') {
+            query.isTrending = trendingStatus === 'Trending';
         }
 
         const total = await productsCollection.countDocuments(query);
@@ -53,6 +59,7 @@ export async function GET(request) {
     }
 }
 
+// POST: নতুন পণ্য যোগ করা
 export async function POST(request) {
     const authResult = await checkAuthAndAdmin();
     if (!authResult.authorized) {
@@ -67,10 +74,13 @@ export async function POST(request) {
         const category = formData.get('category');
         const description = formData.get('description');
         const price = formData.get('price');
+        const quantity = formData.get('quantity'); // নতুন Quantity ফিল্ড
+        const unit = formData.get('unit'); // নতুন Unit ফিল্ড
+        const isTrending = formData.get('isTrending') === 'true'; // নতুন Trending Status ফিল্ড
         const productImage = formData.get('productImage');
 
-        if (!name || !title || !category || !description || !price || !productImage) {
-            return NextResponse.json({ message: 'All fields (name, title, category, description, price, productImage) are required.' }, { status: 400 });
+        if (!name || !title || !category || !description || !price || !productImage || !quantity || !unit) {
+            return NextResponse.json({ message: 'All fields are required.' }, { status: 400 });
         }
 
         const imageBuffer = Buffer.from(await productImage.arrayBuffer());
@@ -88,6 +98,9 @@ export async function POST(request) {
             category,
             description,
             price: parseFloat(price),
+            quantity: parseFloat(quantity), // Quantity কে number এ রূপান্তর করা হয়েছে
+            unit,
+            isTrending,
             productImage: imageUrl,
             createdAt: new Date(),
             updatedAt: new Date(),

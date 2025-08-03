@@ -13,20 +13,26 @@ const SeeProductModal = ({ isOpen, onClose, product }) => {
         <p><strong>Name:</strong> {product.name}</p>
         <p><strong>Category:</strong> {product.category}</p>
         <p><strong>Price:</strong> ${product.price}</p>
+        <p><strong>Quantity:</strong> {product.quantity} {product.unit}</p>
+        <p><strong>Status:</strong> <span className={`font-semibold ${product.isTrending ? 'text-green-600' : 'text-gray-500'}`}>{product.isTrending ? "Trending" : "Not Trending"}</span></p>
         <p><strong>Description:</strong> {product.description}</p>
         <div className="flex justify-end space-x-2">
-          <button className="px-4 py-2 rounded bg-red-500 hover:bg-red-600" onClick={onClose}>Close</button>
+          <button className="px-4 py-2 rounded bg-red-500 hover:bg-red-600 text-white" onClick={onClose}>Close</button>
         </div>
       </div>
     </div>
   );
 };
+
 function CreateProductModal({ isOpen, onClose, onProductCreated }) {
   const [name, setName] = useState("");
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("Vegetables");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [unit, setUnit] = useState("pcs");
+  const [isTrending, setIsTrending] = useState(false);
   const [productImage, setProductImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -47,6 +53,9 @@ function CreateProductModal({ isOpen, onClose, onProductCreated }) {
       formData.append("category", category);
       formData.append("description", description);
       formData.append("price", price);
+      formData.append("quantity", quantity);
+      formData.append("unit", unit);
+      formData.append("isTrending", isTrending);
       formData.append("productImage", productImage);
 
       const res = await fetch("/api/products", {
@@ -57,12 +66,14 @@ function CreateProductModal({ isOpen, onClose, onProductCreated }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to create product");
 
-      // Reset form
       setName("");
       setTitle("");
       setCategory("Vegetables");
       setDescription("");
       setPrice("");
+      setQuantity("");
+      setUnit("pcs");
+      setIsTrending(false);
       setProductImage(null);
       onProductCreated();
       onClose();
@@ -101,6 +112,26 @@ function CreateProductModal({ isOpen, onClose, onProductCreated }) {
             <label className="block text-sm font-medium mb-1 ">Price</label>
             <input type="number" className="w-full border px-3 py-2 rounded" value={price} onChange={(e) => setPrice(e.target.value)} required />
           </div>
+          <div className="flex space-x-2">
+            <div className="flex-1">
+              <label className="block text-sm font-medium mb-1 ">Quantity</label>
+              <input type="number" className="w-full border px-3 py-2 rounded" value={quantity} onChange={(e) => setQuantity(e.target.value)} required />
+            </div>
+            <div className="w-24">
+              <label className="block text-sm font-medium mb-1 ">Unit</label>
+              <select className="w-full border px-3 py-2 rounded" value={unit} onChange={(e) => setUnit(e.target.value)} required>
+                <option value="pcs">pcs</option>
+                <option value="kg">kg</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1 ">Status</label>
+            <select className="w-full border px-3 py-2 rounded" value={isTrending} onChange={(e) => setIsTrending(e.target.value === 'true')}>
+              <option value={false}>Not Trending</option>
+              <option value={true}>Trending</option>
+            </select>
+          </div>
           <div>
             <label className="block text-sm font-medium mb-1 ">Description</label>
             <textarea className="w-full border px-3 py-2 rounded" value={description} onChange={(e) => setDescription(e.target.value)} required />
@@ -111,7 +142,7 @@ function CreateProductModal({ isOpen, onClose, onProductCreated }) {
           </div>
           {error && <p className="text-red-500 text-sm">{error.message}</p>}
           <div className="flex justify-end space-x-2">
-            <button type="button" className="px-4 py-2 rounded bg-red-500 hover:bg-red-600" onClick={onClose} disabled={loading}>Cancel</button>
+            <button type="button" className="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600" onClick={onClose} disabled={loading}>Cancel</button>
             <button type="submit" className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600" disabled={loading}>
               {loading ? "Creating..." : "Create"}
             </button>
@@ -128,6 +159,9 @@ function EditProductModal({ isOpen, onClose, product, onProductUpdated }) {
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [unit, setUnit] = useState("pcs");
+  const [isTrending, setIsTrending] = useState(false);
   const [productImage, setProductImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -139,7 +173,10 @@ function EditProductModal({ isOpen, onClose, product, onProductUpdated }) {
       setCategory(product.category || "");
       setDescription(product.description || "");
       setPrice(product.price || "");
-      setProductImage(product.productImage||"")
+      setQuantity(product.quantity || "");
+      setUnit(product.unit || "pcs");
+      setIsTrending(product.isTrending || false);
+      setProductImage(product.productImage || "");
     }
   }, [product]);
 
@@ -159,6 +196,9 @@ function EditProductModal({ isOpen, onClose, product, onProductUpdated }) {
       formData.append("category", category);
       formData.append("description", description);
       formData.append("price", price);
+      formData.append("quantity", quantity);
+      formData.append("unit", unit);
+      formData.append("isTrending", isTrending);
       if (productImage) {
         formData.append("productImage", productImage);
       }
@@ -223,15 +263,6 @@ function EditProductModal({ isOpen, onClose, product, onProductUpdated }) {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1 ">Description</label>
-            <textarea
-              className="w-full border px-3 py-2 rounded"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              required
-            />
-          </div>
-          <div>
             <label className="block text-sm font-medium mb-1 ">Price</label>
             <input
               type="number"
@@ -242,10 +273,50 @@ function EditProductModal({ isOpen, onClose, product, onProductUpdated }) {
               required
             />
           </div>
+          <div className="flex space-x-2">
+            <div className="flex-1">
+              <label className="block text-sm font-medium mb-1 ">Quantity</label>
+              <input
+                type="number"
+                className="w-full border px-3 py-2 rounded"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+                required
+              />
+            </div>
+            <div className="w-24">
+              <label className="block text-sm font-medium mb-1 ">Unit</label>
+              <select
+                className="w-full border px-3 py-2 rounded"
+                value={unit}
+                onChange={(e) => setUnit(e.target.value)}
+                required
+              >
+                <option value="pcs">pcs</option>
+                <option value="kg">kg</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1 ">Status</label>
+            <select className="w-full border px-3 py-2 rounded" value={isTrending} onChange={(e) => setIsTrending(e.target.value === 'true')}>
+              <option value={false}>Not Trending</option>
+              <option value={true}>Trending</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1 ">Description</label>
+            <textarea
+              className="w-full border px-3 py-2 rounded"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              required
+            />
+          </div>
           <div>
             <label className="block text-sm font-medium mb-1">Image (optional)</label>
-            {productImage&& (
-                <img src={productImage} alt="Current News Image" className="w-24 h-24 object-cover mb-2 rounded" />
+            {productImage && (
+              <img src={productImage} alt="Current News Image" className="w-24 h-24 object-cover mb-2 rounded" />
             )}
             <input
               type="file"
@@ -258,7 +329,7 @@ function EditProductModal({ isOpen, onClose, product, onProductUpdated }) {
           <div className="flex justify-end space-x-2">
             <button
               type="button"
-              className="px-4 py-2 rounded bg-red-500 hover:bg-red-600"
+              className="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600"
               onClick={onClose}
               disabled={loading}
             >
@@ -293,15 +364,14 @@ export default function ProductPage() {
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-  // State for search and category filter
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All"); // Default to 'All' categories
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [trendingStatus, setTrendingStatus] = useState("All");
 
-  const fetchProducts = async (pageNum = page, search = searchQuery, category = selectedCategory) => {
+  const fetchProducts = async (pageNum = page, search = searchQuery, category = selectedCategory, trending = trendingStatus) => {
     try {
       setLoading(true);
-      // Construct the URL with search and category parameters
-      const url = `/api/products?page=${pageNum}&limit=${limit}&search=${search}&category=${category}`;
+      const url = `/api/products?page=${pageNum}&limit=${limit}&search=${search}&category=${category}&isTrending=${trending}`;
       const response = await fetch(url);
       const data = await response.json();
       setProducts(data.data);
@@ -314,12 +384,11 @@ export default function ProductPage() {
   };
 
   useEffect(() => {
-    fetchProducts(page, searchQuery, selectedCategory);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, searchQuery, selectedCategory]); // Refetch when page, search, or category changes
+    fetchProducts(page, searchQuery, selectedCategory, trendingStatus);
+  }, [page, searchQuery, selectedCategory, trendingStatus]);
 
   const handleProductCreated = () => {
-    fetchProducts(page, searchQuery, selectedCategory);
+    fetchProducts(page, searchQuery, selectedCategory, trendingStatus);
   };
 
   const handleDelete = async (id) => {
@@ -331,11 +400,10 @@ export default function ProductPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to delete product");
-      // If last item on page deleted, go to previous page if not on first
       if (products.length === 1 && page > 1) {
         setPage(page - 1);
       } else {
-        fetchProducts(page, searchQuery, selectedCategory);
+        fetchProducts(page, searchQuery, selectedCategory, trendingStatus);
       }
     } catch (err) {
       setError(err);
@@ -350,7 +418,7 @@ export default function ProductPage() {
   };
 
   const handleProductUpdated = () => {
-    fetchProducts(page, searchQuery, selectedCategory);
+    fetchProducts(page, searchQuery, selectedCategory, trendingStatus);
   };
 
   const handleView = (product) => {
@@ -365,19 +433,23 @@ export default function ProductPage() {
     if (page < totalPages) setPage(page + 1);
   };
 
-  // Handle search input change
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
-    setPage(1); // Reset to first page on new search
+    setPage(1);
   };
 
-  // Handle category select change
   const handleCategoryChange = (e) => {
     setSelectedCategory(e.target.value);
-    setPage(1); // Reset to first page on new category filter
+    setPage(1);
   };
 
-  const productCategories = ["All", "Vegetables", "Fruits", "Bread", "Meat"]; // Define your categories here
+  const handleTrendingChange = (e) => {
+    setTrendingStatus(e.target.value);
+    setPage(1);
+  };
+
+  const productCategories = ["All", "Vegetables", "Fruits", "Bread", "Meat"];
+  const trendingOptions = ["All", "Trending", "Not Trending"];
 
   return (
     <div className="p-6 min-h-screen">
@@ -389,12 +461,11 @@ export default function ProductPage() {
         + Create Product
       </button>
 
-      {/* Search and Filter Section */}
-      <div className="mb-4 flex space-x-4">
+      <div className="mb-4 flex items-center space-x-4">
         <input
           type="text"
           placeholder="Search by product name..."
-          className="w-1/2 border px-3 py-2 rounded shadow-sm"
+          className="flex-1 border px-3 py-2 rounded shadow-sm"
           value={searchQuery}
           onChange={handleSearchChange}
         />
@@ -409,8 +480,18 @@ export default function ProductPage() {
             </option>
           ))}
         </select>
+        <select
+          className="w-1/4 border px-3 py-2 rounded shadow-sm"
+          value={trendingStatus}
+          onChange={handleTrendingChange}
+        >
+          {trendingOptions.map((status) => (
+            <option key={status} value={status}>
+              {status}
+            </option>
+          ))}
+        </select>
       </div>
-      {/* End Search and Filter Section */}
 
       <CreateProductModal
         isOpen={isModalOpen}
@@ -438,6 +519,8 @@ export default function ProductPage() {
               <th className="px-6 py-3">Name</th>
               <th className="px-6 py-3">Category</th>
               <th className="px-6 py-3">Price</th>
+              <th className="px-6 py-3">Quantity</th>
+              <th className="px-6 py-3">Status</th>
               <th className="px-6 py-3">Action</th>
             </tr>
           </thead>
@@ -450,6 +533,12 @@ export default function ProductPage() {
                 <td className="px-6 py-4 font-medium">{product.name}</td>
                 <td className="px-6 py-4">{product.category}</td>
                 <td className="px-6 py-4">$ {product.price}</td>
+                <td className="px-6 py-4">{product.quantity} {product.unit}</td>
+                <td className="px-6 py-4">
+                  <span className={`py-1 px-2 rounded-full text-xs font-semibold ${product.isTrending ? 'bg-green-200 text-green-800' : 'bg-gray-200 text-gray-800'}`}>
+                    {product.isTrending ? "Trending" : "Not Trending"}
+                  </span>
+                </td>
                 <td className="px-6 py-4 space-x-2">
                   <button className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs" onClick={() => handleEdit(product)}>
                     Edit
@@ -466,7 +555,6 @@ export default function ProductPage() {
           </tbody>
         </table>
       </div>
-      {/* Pagination Controls */}
       <div className="flex justify-center items-center mt-4 space-x-2">
         <button
           className="px-3 py-1 rounded bg-gray-200 text-gray-700 disabled:opacity-50"
