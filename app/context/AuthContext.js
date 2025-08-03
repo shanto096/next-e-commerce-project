@@ -67,7 +67,10 @@ export function AuthProvider({ children }) {
             method: 'POST',
         });
         if (response.ok) {
+            
             setUser(null); // Clear user state
+            localStorage.removeItem('cart'); 
+            setCartCount(0)
         } else {
             console.error('Failed to logout:', response.statusText);
         }

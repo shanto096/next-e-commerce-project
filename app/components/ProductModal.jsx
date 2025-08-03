@@ -37,7 +37,8 @@ const ProductModal = ({ product, onClose }) => {
     // localStorage-এ product id এবং quantity সেভ করা হচ্ছে
     addToCart(product._id, quantity, user._id);
     console.log(`Adding ${quantity} of ${product.name} to cart.`);
-    onClose(); // Add to Cart এর পর মডাল বন্ধ করা হচ্ছে
+    alert('add to cart')
+    // onClose(); // Add to Cart এর পর মডাল বন্ধ করা হচ্ছে
   };
 
   return (
