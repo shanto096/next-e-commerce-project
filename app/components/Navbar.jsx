@@ -50,6 +50,7 @@ const Navbar = () => {
         <li><Link href="/products" className="text-gray-300 hover:text-white transition duration-300 text-lg">Products</Link></li>
         <li><Link href="/about" className="text-gray-300 hover:text-white transition duration-300 text-lg">About</Link></li>
         <li><Link href="/contact" className="text-gray-300 hover:text-white transition duration-300 text-lg">Contact</Link></li>
+        <li><Link href="/cart" className="text-gray-300 hover:text-white transition duration-300 text-lg">Cart</Link></li>
 
         {/* Conditional rendering for authenticated vs. unauthenticated users */}
         {!user ? (

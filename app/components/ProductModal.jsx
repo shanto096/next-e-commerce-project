@@ -1,7 +1,8 @@
 // components/ProductModal.jsx
 "use client";
 import { useState } from "react";
-import { FaHeart, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaHeart } from "react-icons/fa";
+import { addToCart } from "../../lib/cart"; // নতুন ইম্পোর্ট
 
 const ProductModal = ({ product, onClose }) => {
   const [quantity, setQuantity] = useState(1);
@@ -22,8 +23,10 @@ const ProductModal = ({ product, onClose }) => {
   };
 
   const handleAddToCart = () => {
+    // localStorage-এ product id এবং quantity সেভ করা হচ্ছে
+    addToCart(product._id, quantity);
     console.log(`Adding ${quantity} of ${product.name} to cart.`);
-    // onClose(); // মডাল বন্ধ করতে চাইলে এই লাইনটি ব্যবহার করতে পারেন
+    onClose(); // Add to Cart এর পর মডাল বন্ধ করা হচ্ছে
   };
 
   return (
@@ -56,13 +59,7 @@ const ProductModal = ({ product, onClose }) => {
               </div>
             </div>
             <div className="flex space-x-2 mt-4">
-              <div className="border-2 border-green-500 rounded-lg p-1 cursor-pointer">
-                <img
-                  src={product.productImage}
-                  alt={product.name}
-                  className="w-16 h-16 object-cover rounded-md"
-                />
-              </div>
+              {/* Product images here (if any) */}
             </div>
           </div>
           <div className="space-y-4">
