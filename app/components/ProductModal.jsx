@@ -1,41 +1,134 @@
+// components/ProductModal.jsx
+"use client";
+import { useState } from "react";
+import { FaHeart, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
-'use client'
-import { motion } from 'framer-motion';
+const ProductModal = ({ product, onClose }) => {
+  const [quantity, setQuantity] = useState(1);
+  const [activeImage, setActiveImage] = useState(
+    product ? product.productImage : ""
+  );
 
-export default function ProductModal({ product, onClose }) {
-  if (!product) return null;
+  if (!product) {
+    return null;
+  }
+
+  const handleQuantityChange = (type) => {
+    if (type === "increase") {
+      setQuantity((prev) => prev + 1);
+    } else if (type === "decrease" && quantity > 1) {
+      setQuantity((prev) => prev - 1);
+    }
+  };
+
+  const handleAddToCart = () => {
+    console.log(`Adding ${quantity} of ${product.name} to cart.`);
+    // onClose(); // মডাল বন্ধ করতে চাইলে এই লাইনটি ব্যবহার করতে পারেন
+  };
 
   return (
-    <div 
-      className="fixed inset-0 bg-black  bg-opacity-100 flex justify-center items-center z-50"
-      style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
       onClick={onClose}
     >
-      <motion.div 
-        initial={{ y: "-100vh" }} 
-        animate={{ y: 0 }} 
-        exit={{ y: "-100vh" }} 
-        transition={{ duration: 0.3 }}
-        className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full relative"
-        onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
+      <div
+        className="bg-white rounded-lg shadow-lg max-w-4xl w-full mx-4 my-8 md:my-12 p-6 overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
       >
-        <button 
-          onClick={onClose} 
-          className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl font-bold"
-        >
-          &times;
-        </button>
-        <h2 className="text-2xl font-bold mb-4">{product.name}</h2>
-        <img src={product.productImage} alt={product.name} className="w-64 h-64 object-contain mx-auto my-5" />
-        <p className="text-gray-700 mb-2">{product.description}</p>
-        <p className="text-green-600 font-bold text-xl">${product.price}</p>
-        <div className="text-yellow-500 mt-2">
-          ★★★★☆ <span className="text-sm text-gray-600">({product.rating || 4.0})</span>
+        <div className="flex justify-end">
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-800 text-2xl font-bold"
+          >
+            &times;
+          </button>
         </div>
-        <button className="mt-6 bg-blue-600 text-white py-2 px-4 rounded-full hover:bg-blue-700 transition duration-300 w-full">
-          Add to Cart
-        </button>
-      </motion.div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="flex flex-col items-center">
+            <div className="relative w-full max-w-sm">
+              <img
+                src={activeImage || product.productImage}
+                alt={product.name}
+                className="w-full h-80 object-contain rounded-lg"
+              />
+              <div className="absolute top-4 right-4 bg-white p-2 rounded-full shadow-md cursor-pointer">
+                <FaHeart className="text-red-500" />
+              </div>
+            </div>
+            <div className="flex space-x-2 mt-4">
+              <div className="border-2 border-green-500 rounded-lg p-1 cursor-pointer">
+                <img
+                  src={product.productImage}
+                  alt={product.name}
+                  className="w-16 h-16 object-cover rounded-md"
+                />
+              </div>
+            </div>
+          </div>
+          <div className="space-y-4">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
+              {product.name}
+            </h2>
+            <p className="text-lg text-gray-600">{product.title}</p>
+            <div className="flex items-center text-yellow-500 space-x-1">
+              <span>★★★★★</span>
+              <span className="text-gray-600 text-sm">
+                (Ratings 60 | 11 Answered Questions)
+              </span>
+            </div>
+            <p className="text-sm text-gray-500">
+              <span className="font-semibold">Brand:</span> MY SHOPEE BD
+            </p>
+            <div className="flex items-end space-x-2">
+              <span className="text-4xl font-bold text-green-600">
+                ৳ {product.price}
+              </span>
+            </div>
+            <p className="text-gray-700">{product.description}</p>
+            <div>
+              <p className="text-gray-700 font-semibold mb-2">Quantity</p>
+              <div className="flex items-center border border-gray-300 rounded-md w-32">
+                <button
+                  onClick={() => handleQuantityChange("decrease")}
+                  className="p-2 border-r border-gray-300 text-gray-600 hover:bg-gray-100"
+                >
+                  -
+                </button>
+                <input
+                  type="text"
+                  value={quantity}
+                  readOnly
+                  className="w-full text-center border-none focus:outline-none"
+                />
+                <button
+                  onClick={() => handleQuantityChange("increase")}
+                  className="p-2 border-l border-gray-300 text-gray-600 hover:bg-gray-100"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+            <div className="flex space-x-4 mt-6">
+              <button
+                onClick={() => {
+                  handleAddToCart();
+                }}
+                className="flex-1 py-3 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition duration-200"
+              >
+                Buy Now
+              </button>
+              <button
+                onClick={handleAddToCart}
+                className="flex-1 py-3 bg-orange-500 text-white font-semibold rounded-md hover:bg-orange-600 transition duration-200"
+              >
+                Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
-} 
+};
+
+export default ProductModal;
