@@ -6,14 +6,23 @@ import {
   getCartItems,
   updateCartItemQuantity,
   removeCartItem,
-} from "../../lib/cart"; // নতুন ইম্পোর্ট  
+} from "../../lib/cart"; // নতুন ইম্পোর্ট
+import { useAuth } from "../context/AuthContext";
+import { useRouter } from "next/navigation";
 
 const CartPage = () => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { user } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
+    if (!user) {
+      router.push(`/login?returnTo=${encodeURIComponent(window.location.pathname)}`);
+      return;
+    }
+
     const fetchCartProducts = async () => {
       try {
         const storedCart = getCartItems();

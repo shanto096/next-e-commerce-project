@@ -3,12 +3,17 @@
 import { useState } from "react";
 import { FaHeart } from "react-icons/fa";
 import { addToCart } from "../../lib/cart"; // নতুন ইম্পোর্ট
+import { useAuth } from "../context/AuthContext";
+import { useRouter } from "next/navigation";
 
 const ProductModal = ({ product, onClose }) => {
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(
     product ? product.productImage : ""
   );
+
+  const router = useRouter();
+  const { user } = useAuth();
 
   if (!product) {
     return null;
@@ -23,8 +28,14 @@ const ProductModal = ({ product, onClose }) => {
   };
 
   const handleAddToCart = () => {
+    if (!user) {
+      // User is not logged in, redirect to login page
+      router.push(`/login?returnTo=${encodeURIComponent(window.location.pathname)}`);
+      onClose(); // Close the modal
+      return;
+    }
     // localStorage-এ product id এবং quantity সেভ করা হচ্ছে
-    addToCart(product._id, quantity);
+    addToCart(product._id, quantity, user._id);
     console.log(`Adding ${quantity} of ${product.name} to cart.`);
     onClose(); // Add to Cart এর পর মডাল বন্ধ করা হচ্ছে
   };

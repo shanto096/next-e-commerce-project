@@ -1,11 +1,15 @@
 'use client'
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [cartCount, setCartCount] = useState(0);
+
+    const router = useRouter();
+    const searchParams = useSearchParams();
 
     const getCartCount = () => {
         if (typeof window !== 'undefined') {
@@ -50,6 +54,12 @@ export function AuthProvider({ children }) {
     const login = (userData) => {
         setUser(userData);
         // Removed localStorage logic
+        const returnTo = searchParams.get('returnTo');
+        if (returnTo) {
+            router.push(decodeURIComponent(returnTo));
+        } else {
+            router.push('/admin/dashboard'); // Default redirect after login
+        }
     };
 
     const logout = async () => {

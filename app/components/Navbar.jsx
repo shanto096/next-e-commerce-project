@@ -49,17 +49,19 @@ const Navbar = () => {
         <li><Link href="/contact" className="text-gray-300 hover:text-white transition duration-300 text-lg">Contact</Link></li>
         
         {/* Cart Item with count badge */}
-        <li className="relative">
-          <Link href="/cart" className="flex items-center text-gray-300 hover:text-white transition duration-300 text-lg">
-            <FaShoppingCart className="mr-2" />
-            <span>Cart</span>
-            {cartCount > 0 && (
-              <span className="absolute -top-3 left-8 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                {cartCount}
-              </span>
-            )}
-          </Link>
-        </li>
+        {user && (
+          <li className="relative">
+            <Link href="/cart" className="flex items-center text-gray-300 hover:text-white transition duration-300 text-lg">
+              <FaShoppingCart className="mr-2" />
+              <span>Cart</span>
+              {cartCount > 0 && (
+                <span className="absolute -top-3 left-8 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
+          </li>
+        )}
 
         {/* Conditional rendering for authenticated vs. unauthenticated users */}
         {!user ? (
