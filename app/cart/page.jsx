@@ -1,4 +1,4 @@
-// components/CartPage.jsx
+
 "use client";
 import React, { useState, useEffect } from 'react';
 import { FaTrashAlt, FaTruck } from 'react-icons/fa';
@@ -18,6 +18,7 @@ const CartPage = () => {
   const router = useRouter();
 
   useEffect(() => {
+    // যদি লগইন করা না থাকে, তাহলে লগইন পেজে রিডাইরেক্ট করবে
     if (!user) {
       router.push(`/login?returnTo=${encodeURIComponent(window.location.pathname)}`);
       return;
@@ -47,7 +48,6 @@ const CartPage = () => {
 
         const { data: fetchedProducts } = await response.json();
 
-        // fetchedProducts এবং storedCart ডেটা মার্জ করা
         const mergedCartItems = storedCart.map(cartItem => {
           const product = fetchedProducts.find(p => p._id === cartItem.id);
           return product ? { ...product, quantity: cartItem.quantity } : null;
@@ -63,7 +63,7 @@ const CartPage = () => {
     };
 
     fetchCartProducts();
-  }, []);
+  }, [user, router]); // user এবং router কে dependency array-তে যুক্ত করা হয়েছে
 
   const handleQuantityChange = (id, type) => {
     const updatedItems = cartItems.map((item) => {
@@ -203,7 +203,10 @@ const CartPage = () => {
         </div>
       </div>
       <div className="mt-6 flex justify-end">
-        <button className="w-full md:w-auto px-12 py-4 bg-black text-white font-semibold text-lg rounded-md hover:bg-gray-800 transition-colors">
+        <button
+          onClick={() => router.push('/checkout')} // এই লাইনটি আপডেট করা হয়েছে
+          className="w-full md:w-auto px-12 py-4 bg-black text-white font-semibold text-lg rounded-md hover:bg-gray-800 transition-colors"
+        >
           Check out
         </button>
       </div>
