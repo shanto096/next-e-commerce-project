@@ -1,4 +1,3 @@
-// app/api/auth/login/route.js
 import { NextResponse } from 'next/server';
 import clientPromise from '../../../../lib/mongodb'; // MongoDB ক্লায়েন্ট ইম্পোর্ট করুন
 import bcrypt from 'bcryptjs'; // পাসওয়ার্ড তুলনা করার জন্য bcryptjs ইম্পোর্ট করুন
