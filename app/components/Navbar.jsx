@@ -37,7 +37,7 @@ const Navbar = () => {
       {/* Brand/Logo */}
       <div className="text-2xl font-extrabold text-white tracking-wide">
         <Link href="/" className="hover:text-gray-300 transition duration-300">
-          E-Commerce
+         SobarShop
         </Link>
       </div>
 
