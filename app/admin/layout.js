@@ -4,6 +4,7 @@ import { verifyToken } from "../../lib/jwt"; // নিশ্চিত করু�
 import { redirect } from 'next/navigation';
 import Sidebar from '../components/Sidebar'
 import DashboardNavbar from '../components/DashboardNavbar'
+import { Suspense } from "react";
 
 
 
@@ -40,6 +41,7 @@ export default async function AdminLayout({ children }) { // async কিওয�
   // 5. যদি সব চেক পাস করে, তাহলে অ্যাডমিন প্যানেলের কন্টেন্ট দেখান।
   return (
     <>
+    <Suspense fallback={<div>Loading...</div>}>
     <div className="">
     <DashboardNavbar/>
     <div className="flex min-h-screen  ">
@@ -49,6 +51,7 @@ export default async function AdminLayout({ children }) { // async কিওয�
       <main className="flex-1 p-8">{children}</main>
     </div>
     </div>
+    </Suspense>
     </>
   );
 }

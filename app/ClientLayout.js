@@ -3,6 +3,7 @@ import { usePathname } from 'next/navigation';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import { AuthProvider } from './context/AuthContext';
+import { Suspense } from 'react';
 
 export default function ClientLayout({ children }) {
   const pathname = usePathname();
@@ -13,7 +14,9 @@ export default function ClientLayout({ children }) {
   return (
     <AuthProvider>
       {shouldShowNavbar && <Navbar />}
+      <Suspense fallback={<div>Loading...</div>}>
       {children}
+      </Suspense>
       {shouldShowNavbar && <Footer />}
     </AuthProvider>
   );
