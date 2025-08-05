@@ -20,7 +20,7 @@ export function AuthProvider({ children }) {
     };
 
     const fetchUser = async () => {
-        const response = await fetch('/api/auth/me');
+        const response = await fetch('/api/me');
         if (response.ok) {
             const userData = await response.json();
             setUser(userData);
@@ -63,7 +63,7 @@ export function AuthProvider({ children }) {
     };
 
     const logout = async () => {
-        const response = await fetch('/api/auth/logout', {
+        const response = await fetch('/api/logout', {
             method: 'POST',
         });
         if (response.ok) {

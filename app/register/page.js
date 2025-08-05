@@ -27,7 +27,7 @@ export default function RegisterPage() {
 
     try {
       // /api/auth/register এপিআইতে POST রিকোয়েস্ট পাঠানো
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch('/api/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
