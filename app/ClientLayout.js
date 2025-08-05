@@ -12,12 +12,12 @@ export default function ClientLayout({ children }) {
   const shouldShowNavbar = !pathname.startsWith('/admin');
 
   return (
-    <AuthProvider>
-      {shouldShowNavbar && <Navbar />}
-      <Suspense fallback={<div>Loading...</div>}>
-      {children}
-      </Suspense>
-      {shouldShowNavbar && <Footer />}
-    </AuthProvider>
+    <Suspense fallback={<div>Loading...</div>}>
+      <AuthProvider>
+        {shouldShowNavbar && <Navbar />}
+        {children}
+        {shouldShowNavbar && <Footer />}
+      </AuthProvider>
+    </Suspense>
   );
 }
