@@ -1,9 +1,7 @@
-// app/components/RecentNewsSlider.jsx
 'use client';
 
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
- // Fallback image
 
 const RecentNewsSlider = () => {
   const [news, setNews] = useState([]);
@@ -64,8 +62,15 @@ const RecentNewsSlider = () => {
 
   return (
     <>
-      <div className="w-full py-16 px-4 sm:px-10 bg-white">
+      <div
+        className="w-full py-16 px-4 sm:px-10 transition-colors duration-500"
+        style={{
+          background: 'var(--background)',
+          color: 'var(--foreground)',
+        }}
+      >
         <h2 className="text-3xl font-bold text-center mb-10">Recent News</h2>
+
         <div className="relative w-full overflow-hidden h-[500px]">
           <AnimatePresence initial={false}>
             {news.length > 0 && (
@@ -80,7 +85,11 @@ const RecentNewsSlider = () => {
                 {news.slice(index, index + 3).map((item) => (
                   <div
                     key={item._id}
-                    className="bg-white rounded-lg shadow-md max-w-sm w-full"
+                    className="rounded-lg shadow-md max-w-sm w-full transition-colors duration-500"
+                    style={{
+                      background: 'var(--background)',
+                      color: 'var(--foreground)',
+                    }}
                   >
                     <img
                       src={item.image}
@@ -91,10 +100,12 @@ const RecentNewsSlider = () => {
                     />
                     <div className="p-5">
                       <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
-                      <p className="text-gray-600 text-sm mb-4 line-clamp-3">{item.description}</p>
+                      <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3">
+                        {item.description}
+                      </p>
                       <button
                         onClick={() => handleOpenModal(item)}
-                        className="text-black font-semibold flex items-center gap-1"
+                        className="font-semibold flex items-center gap-1 text-black dark:text-white"
                       >
                         Read more <span className="text-lg">→</span>
                       </button>
@@ -114,17 +125,21 @@ const RecentNewsSlider = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-gray-300/75  bg-opacity-75 flex justify-center items-center p-4 z-50"
+            className="fixed inset-0 bg-gray-300/75 dark:bg-black/70 flex justify-center items-center p-4 z-50"
           >
             <motion.div
               initial={{ scale: 0.9, y: 50 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 50 }}
-              className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6 relative"
+              className="rounded-lg shadow-xl max-w-2xl w-full p-6 relative transition-colors duration-500"
+              style={{
+                background: 'var(--background)',
+                color: 'var(--foreground)',
+              }}
             >
               <button
                 onClick={handleCloseModal}
-                className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-2xl font-bold"
+                className="absolute top-3 right-3 text-gray-500 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white text-2xl font-bold"
               >
                 &times;
               </button>
@@ -134,11 +149,11 @@ const RecentNewsSlider = () => {
                   src={selectedNews.image}
                   alt={selectedNews.title}
                   width={500}
-                      height={300}
-                      className="rounded-t-lg h-60 object-cover"
+                  height={300}
+                  className="rounded-t-lg h-60 object-cover"
                 />
               </div>
-              <p className="text-gray-700 whitespace-pre-line">{selectedNews.description}</p>
+              <p className="whitespace-pre-line">{selectedNews.description}</p>
             </motion.div>
           </motion.div>
         )}
