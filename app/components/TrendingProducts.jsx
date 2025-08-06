@@ -62,11 +62,16 @@ export default function TrendingProducts() {
     return () => clearInterval(interval);
   }, [total]);
 
-  // Create an extended array for infinite scrolling
   const extendedProducts = [...products, ...products];
-  // add
+
   return (
-    <section className="w-full py-12 bg-white overflow-hidden">
+    <section
+      className="w-full py-12 transition-colors duration-500"
+      style={{
+        background: 'var(--background)',
+        color: 'var(--foreground)',
+      }}
+    >
       <div className="max-w-7xl mx-auto text-center px-4">
         <h2 className="text-3xl font-bold mb-8">Trending products</h2>
 
@@ -78,13 +83,24 @@ export default function TrendingProducts() {
             transition={{ ease: 'easeInOut', duration: 0.8 }}
           >
             {extendedProducts.map((product, idx) => (
-              <div key={idx} className="w-[250px] flex-shrink-0 bg-white shadow-md rounded-xl p-4 relative">
+              <div
+                key={idx}
+                className="w-[250px] flex-shrink-0 shadow-md rounded-xl p-4 relative transition-colors duration-500"
+                style={{
+                  background: 'var(--background)',
+                  color: 'var(--foreground)',
+                }}
+              >
                 {product.discount && (
                   <span className="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-0.5 rounded">
                     {product.discount}
                   </span>
                 )}
-                <img src={product.image} alt={product.name} className="w-full h-40 object-contain mb-4" />
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="w-full h-40 object-contain mb-4"
+                />
                 <h3 className="font-semibold">{product.name}</h3>
                 <p className="text-green-600 text-lg font-bold">
                   €{product.price.toFixed(2)}{' '}
@@ -100,11 +116,11 @@ export default function TrendingProducts() {
           </motion.div>
         </div>
 
-       <Link href={'/products'}>
-        <button className="mt-10 px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
-          See all products
-        </button>
-       </Link>
+        <Link href={'/products'}>
+          <button className="mt-10 px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
+            See all products
+          </button>
+        </Link>
       </div>
     </section>
   );

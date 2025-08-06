@@ -2,10 +2,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "../context/AuthContext"; // Assuming AuthContext provides user.name, user.email, user.role
+import { useTheme } from "../context/ThemeContext";
 import { FaShoppingCart } from 'react-icons/fa'; // কার্ট আইকন ইম্পোর্ট করুন
+import { MdLightMode, MdDarkMode } from 'react-icons/md';
 
 const Navbar = () => {
   const { user, logout, cartCount  } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [showUserModal, setShowUserModal] = useState(false);
   const modalRef = useRef(null);
 
@@ -42,7 +45,7 @@ const Navbar = () => {
       </div>
 
       {/* Navigation links */}
-      <ul className="flex space-x-6 items-center">
+      <ul className="flex space-x-6 items-center">z
         <li><Link href="/" className="text-gray-300 hover:text-white transition duration-300 text-lg">Home</Link></li>
         <li><Link href="/products" className="text-gray-300 hover:text-white transition duration-300 text-lg">Products</Link></li>
         <li><Link href="/about" className="text-gray-300 hover:text-white transition duration-300 text-lg">About</Link></li>
@@ -115,6 +118,20 @@ const Navbar = () => {
             )}
           </li>
         )}
+
+        {/* Theme Toggle Button */}
+        <li>
+          <button
+            onClick={toggleTheme}
+            className="text-gray-300 hover:text-white transition duration-300 text-lg p-2 rounded-full bg-gray-700 hover:bg-gray-600 focus:outline-none"
+          >
+            {theme === 'dark' ? (
+              <MdLightMode size={24} className="text-yellow-400" />
+            ) : (
+              <MdDarkMode size={24} className="text-gray-800" />
+            )}
+          </button>
+        </li>
       </ul>
     </nav>
   );
