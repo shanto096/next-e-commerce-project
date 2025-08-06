@@ -65,7 +65,7 @@ const RecentNewsSlider = () => {
       <div
         className="w-full py-16 px-4 sm:px-10 transition-colors duration-500"
         style={{
-          background: 'var(--background)',
+          background: 'var(--card-bg)',
           color: 'var(--foreground)',
         }}
       >

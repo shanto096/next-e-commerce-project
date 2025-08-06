@@ -66,9 +66,9 @@ export default function TrendingProducts() {
 
   return (
     <section
-      className="w-full py-12 transition-colors duration-500"
+      className="w-full py-12 transition-colors duration-500 mb-20"
       style={{
-        background: 'var(--background)',
+        background: 'var(--card-bg)',
         color: 'var(--foreground)',
       }}
     >

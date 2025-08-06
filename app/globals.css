@@ -16,17 +16,13 @@
 :root {
     --background: #FFFFFF;
     --foreground: #171717;
-    --card-bg: #bb1010;
+    --card-bg: #ece7e7;
 }
 
 [data-theme="dark"] {
     --background: #1a202c;
     --foreground: #e2e8f0;
-    --card-bg: #1814e1;
-}
-
-.card-bg {
-    background: var(--card-bg);
+    --card-bg: #121213;
 }
 
 body {
