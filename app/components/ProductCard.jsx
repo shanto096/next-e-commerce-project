@@ -26,9 +26,12 @@ export default function ProductCard({ product }) {
 
   return (
     <>
-      <motion.div 
+      <motion.div  style={{
+        background: 'var(--card-bg)',
+        color: 'var(--foreground)',
+      }}
         whileHover={{ scale: 1.03 }} 
-        className="border rounded-2xl p-5 bg-white relative cursor-pointer" // cursor-pointer যোগ করা হয়েছে
+        className="rounded-2xl p-3 bg-white relative cursor-pointer" // cursor-pointer যোগ করা হয়েছে
         onClick={handleCardClick} // এটি পুরো কার্ডে ক্লিক করলে মডাল খুলবে
       >
         <div className="absolute top-3 right-3 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
@@ -40,7 +43,7 @@ export default function ProductCard({ product }) {
           <h3 className="font-semibold text-lg">{product.name}</h3>
           <p className="text-green-600 font-bold">${product.price}</p>
           <button 
-            className="mt-4 bg-blue-600 text-white py-2 px-4 rounded-full hover:bg-blue-700 transition duration-300"
+            className="mt-4 bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition duration-300"
             onClick={handleAddToCartClick} // এই বাটনে ক্লিক করলে মডাল খুলবে
           >
             Add to Cart

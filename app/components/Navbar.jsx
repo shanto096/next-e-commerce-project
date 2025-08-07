@@ -42,11 +42,14 @@ const Navbar = () => {
 
   return (
     // Navbar container with a sleek dark background
-    <nav className="w-full flex items-center justify-between py-3 px-8 border-b border-gray-800 bg-gray-900 shadow-lg z-10 sticky top-0">
+    <nav style={{
+      background: 'var(--card-bg)',
+      color: 'var(--foreground)',
+    }} className="w-full flex items-center justify-between py-3 px-8  shadow-xl z-10 sticky top-0 ">
       {/* Brand/Logo */}
-      <div className="text-2xl font-extrabold text-white tracking-wide">
-        <Link href="/" className="hover:text-gray-300 transition duration-300">
-         SobarShop
+        <div className="text-2xl font-extrabold text-green-600 tracking-wide">
+        <Link href="/" className=" transition duration-300">
+         AmarShop
         </Link>
       </div>
 
@@ -66,19 +69,19 @@ const Navbar = () => {
 
       {/* Navigation links */}
       <ul className="hidden md:flex space-x-6 items-center">
-        <li><Link href="/" className="text-gray-300 hover:text-white transition duration-300 text-lg">Home</Link></li>
-        <li><Link href="/products" className="text-gray-300 hover:text-white transition duration-300 text-lg">Products</Link></li>
-        <li><Link href="/about" className="text-gray-300 hover:text-white transition duration-300 text-lg">About</Link></li>
-        <li><Link href="/contact" className="text-gray-300 hover:text-white transition duration-300 text-lg">Contact</Link></li>
+        <li><Link href="/" className=" hover:text-white transition duration-300 text-lg">Home</Link></li>
+        <li><Link href="/products" className=" hover:text-white transition duration-300 text-lg">Products</Link></li>
+        <li><Link href="/about" className=" hover:text-white transition duration-300 text-lg">About</Link></li>
+        <li><Link href="/contact" className=" hover:text-white transition duration-300 text-lg">Contact</Link></li>
         
         {/* Cart Item with count badge */}
         {user && (
           <li className="relative">
-            <Link href="/cart" className="flex items-center text-gray-300 hover:text-white transition duration-300 text-lg">
+            <Link href="/cart" className="flex items-center transition duration-300 text-lg">
               <FaShoppingCart className="mr-2" />
-              <span>Cart</span>
+            
               {cartCount > 0 && (
-                <span className="absolute -top-3 left-8 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                <span className="absolute -top-3 left-4 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                   {cartCount}
                 </span>
               )}
@@ -107,7 +110,7 @@ const Navbar = () => {
               >
                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
               </svg>
-              <span className="font-semibold text-lg">{user.name || user.email.split('@')[0]}</span>
+             
             </button>
 
             {/* User Modal */}
@@ -143,7 +146,7 @@ const Navbar = () => {
         <li>
           <button
             onClick={toggleTheme}
-            className="text-gray-300 hover:text-white transition duration-300 text-lg p-2 rounded-full bg-gray-700 hover:bg-gray-600 focus:outline-none"
+            className=" transition duration-300 text-lg "
           >
             {theme === 'dark' ? (
               <MdLightMode size={24} className="text-yellow-400" />
@@ -165,11 +168,10 @@ const Navbar = () => {
 
             {user && (
               <li className="relative">
-                <Link href="/cart" onClick={toggleMobileMenu} className="flex items-center text-gray-300 hover:text-white transition duration-300 text-lg py-2">
+                <Link href="/cart" onClick={toggleMobileMenu} className="flex items-center   transition duration-300 text-lg py-2">
                   <FaShoppingCart className="mr-2" />
-                  <span>Cart</span>
                   {cartCount > 0 && (
-                    <span className="absolute -top-1 left-12 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    <span className="absolute -top-1 left-12 bg-red-600  text-xs rounded-full h-5 w-5 flex items-center justify-center">
                       {cartCount}
                     </span>
                   )}
@@ -205,7 +207,7 @@ const Navbar = () => {
             <li>
               <button
                 onClick={toggleTheme}
-                className="text-gray-300 hover:text-white transition duration-300 text-lg p-2 rounded-full bg-gray-700 hover:bg-gray-600 focus:outline-none"
+                className="transition duration-300 text-lg "
               >
                 {theme === 'dark' ? (
                   <MdLightMode size={24} className="text-yellow-400" />

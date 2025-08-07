@@ -66,7 +66,7 @@ export default function HomePage() {
 
   return (
     <main className="max-w-7xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-4"> Our Organic Products </h1>{" "}
+      <h1 className="text-3xl font-bold text-green-600 mb-4"> Our Organic Products </h1>{" "}
       <CategoryTabs
         selected={selectedCategory}
         onSelect={handleCategorySelect}

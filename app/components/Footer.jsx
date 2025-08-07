@@ -6,12 +6,12 @@ const Footer = () => {
     <footer style={{
       background: 'var(--card-bg)',
       color: 'var(--foreground)',
-    }} className=" py-12">
+    }} className=" py-12 mt-20 ">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="mb-6 md:mb-0">
-            <h3 className="text-2xl font-bold text-green-600 mb-4">Amar Shop</h3>
+            <h3 className="text-2xl font-bold text-green-600 mb-4">AmarShop</h3>
             <p className="text-sm leading-relaxed">
               Your one-stop shop for fresh, organic, and healthy products delivered right to your doorstep.
               Quality and freshness guaranteed.
