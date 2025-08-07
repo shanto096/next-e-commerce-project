@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -52,16 +53,19 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">লগইন করুন</h2>
+    <div  className="min-h-screen flex items-center justify-center  p-4">
+      <div style={{
+      background: 'var(--card-bg)',
+      color: 'var(--foreground)',
+    }} className=" p-8 rounded-lg shadow-xl w-full max-w-md">
+        <h2 className="text-3xl font-bold text-center text-green-600  mb-8">Login</h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">ইমেল:</label>
+            <label htmlFor="email" className="block text-sm font-medium  mb-1">Email:</label>
             <input
               type="email"
               id="email"
-              className="mt-1 block w-full px-4 py-2 border text-black border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              className="mt-1 block w-full px-4 py-2 border  border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -69,11 +73,11 @@ export default function LoginPage() {
             />
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">পাসওয়ার্ড:</label>
+            <label htmlFor="password" className="block text-sm font-medium  mb-1">Password:</label>
             <input
               type="password"
               id="password"
-              className="mt-1 block w-full px-4 py-2 border text-black border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              className="mt-1 block w-full px-4 py-2 border  border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -82,22 +86,21 @@ export default function LoginPage() {
           </div>
           <button
             type="submit"
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-green-600 text-white px-8 w-full py-2 rounded-md text-lg font-semibold hover:bg-green-700 transition-all duration-300 shadow-lg"
             disabled={loading}
           >
-            {loading ? 'লগইন হচ্ছে...' : 'লগইন করুন'}
+            {loading ? 'Login...' : 'Login'}
           </button>
         </form>
-        {message && (
-          <p className={`mt-6 text-center text-md font-semibold ${message.includes('successful') ? 'text-green-600' : 'text-red-600'}`}>
-            {message}
-          </p>
-        )}
-        <p className="mt-6 text-center text-sm text-gray-600">
-          একটি অ্যাকাউন্ট নেই?{' '}
-          <a href="/register" className="font-medium text-blue-600 hover:text-blue-500">
-            রেজিস্টার করুন
-          </a>
+        {
+          message && <p className='text-center text-sm text-red-600'>{message}</p>
+        }
+        
+        <p className="mt-6 text-center text-sm">
+          Don&apos;t have an account?{' '}
+          <Link href="/register" className="font-medium text-blue-600 hover:text-blue-500">
+            Register
+          </Link>
         </p>
       </div>
     </div>
