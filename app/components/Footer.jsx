@@ -3,12 +3,15 @@ import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from 'react-icons/f
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-900 text-gray-300 py-12">
+    <footer style={{
+      background: 'var(--card-bg)',
+      color: 'var(--foreground)',
+    }} className=" py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="mb-6 md:mb-0">
-            <h3 className="text-xl font-bold text-white mb-4">E-Commerce</h3>
+            <h3 className="text-2xl font-bold text-green-600 mb-4">Amar Shop</h3>
             <p className="text-sm leading-relaxed">
               Your one-stop shop for fresh, organic, and healthy products delivered right to your doorstep.
               Quality and freshness guaranteed.
@@ -17,7 +20,7 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div className="mb-6 md:mb-0">
-            <h3 className="text-lg font-semibold text-white mb-4">Quick Links</h3>
+            <h3 className="text-lg font-semibold  mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li><Link href="/" className="hover:text-green-400 transition-colors duration-200">Home</Link></li>
               <li><Link href="/products" className="hover:text-green-400 transition-colors duration-200">Shop</Link></li>
@@ -29,7 +32,7 @@ const Footer = () => {
 
           {/* Categories */}
           <div className="mb-6 md:mb-0">
-            <h3 className="text-lg font-semibold text-white mb-4">Categories</h3>
+            <h3 className="text-lg font-semibold  mb-4">Categories</h3>
             <ul className="space-y-2">
               <li><Link href="/products?category=Vegetables" className="hover:text-green-400 transition-colors duration-200">Vegetables</Link></li>
               <li><Link href="/products?category=Fruits" className="hover:text-green-400 transition-colors duration-200">Fruits</Link></li>
@@ -41,7 +44,7 @@ const Footer = () => {
 
           {/* Contact & Social */}
           <div>
-            <h3 className="text-lg font-semibold text-white mb-4">Connect With Us</h3>
+            <h3 className="text-lg font-semibold  mb-4">Connect With Us</h3>
             <p className="text-sm mb-2">Email: <a href="mailto:info@ecommerce.com" className="hover:text-green-400 transition-colors duration-200">info@ecommerce.com</a></p>
             <p className="text-sm mb-4">Phone: <a href="tel:+880123456789" className="hover:text-green-400 transition-colors duration-200">+880 123 456789</a></p>
             <div className="flex space-x-4">
