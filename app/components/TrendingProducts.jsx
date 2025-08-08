@@ -4,65 +4,39 @@ import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 
-const products = [
-  {
-    id: 1,
-    name: 'Orange juice natural',
-    price: 66,
-    originalPrice: null,
-    rating: 0,
-    image: '/products/orange-juice.png',
-  },
-  {
-    id: 2,
-    name: 'Healthy papaya 100% organic',
-    price: 20,
-    originalPrice: null,
-    rating: 0,
-    image: '/products/papaya.png',
-  },
-  {
-    id: 3,
-    name: 'Fruits banana 100% organic',
-    price: 22,
-    originalPrice: 44,
-    rating: 0,
-    image: '/products/banana.png',
-    discount: '50%',
-  },
-  {
-    id: 4,
-    name: 'Fresh seafoods',
-    price: 18,
-    originalPrice: 44,
-    rating: 0,
-    image: '/products/seafood.png',
-    discount: '59%',
-  },
-  {
-    id: 5,
-    name: 'Fresh organic reachter',
-    price: 44,
-    originalPrice: 65,
-    rating: 0,
-    image: '/products/peach.png',
-    discount: '32%',
-  },
-];
 
 export default function TrendingProducts() {
+  const [trendingProducts, setTrendingProducts] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const total = products.length;
   const containerRef = useRef();
+  const total = trendingProducts.length;
 
   useEffect(() => {
+    const fetchTrendingProducts = async () => {
+      try {
+        const response = await fetch('/api/products?isTrending=Trending');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setTrendingProducts(data.data);
+      } catch (error) {
+        console.error('Error fetching trending products:', error);
+      }
+    };
+
+    fetchTrendingProducts();
+  }, []);
+
+  useEffect(() => {
+    if (total === 0) return;
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % total);
     }, 5000);
     return () => clearInterval(interval);
   }, [total]);
 
-  const extendedProducts = [...products, ...products];
+  const extendedProducts = [...trendingProducts, ...trendingProducts];
 
   return (
     <section
@@ -84,7 +58,7 @@ export default function TrendingProducts() {
           >
             {extendedProducts.map((product, idx) => (
               <div
-                key={idx}
+                key={product._id || idx}
                 className="w-[250px] flex-shrink-0 shadow-md rounded-xl p-4 relative transition-colors duration-500"
                 style={{
                   background: 'var(--background)',
@@ -97,7 +71,7 @@ export default function TrendingProducts() {
                   </span>
                 )}
                 <img
-                  src={product.image}
+                  src={product.productImage}
                   alt={product.name}
                   className="w-full h-40 object-contain mb-4"
                 />
