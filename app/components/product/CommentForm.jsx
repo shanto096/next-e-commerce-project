@@ -5,30 +5,49 @@ import { FaStar } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
 
 // এটি ব্যবহারকারীদের রেটিং এবং কমেন্ট লেখার জন্য একটি ফর্ম
-const CommentForm = ({ onCommentSubmit, productId }) => {
+const CommentForm = ({ onCommentSubmitted, productId }) => {
   const { user } = useAuth();
   const [rating, setRating] = useState(0);
   const [commentText, setCommentText] = useState("");
   const [hoverRating, setHoverRating] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!commentText || rating === 0) {
-      // alert-এর পরিবর্তে কাস্টম নোটিফিকেশন ব্যবহার করা উচিত
       console.error("Please provide a rating and a comment.");
       return;
     }
-    // Mock user data from the logged-in user context
-    onCommentSubmit({
-      productId,
-      userId: user._id,
-      userName: user.name || user.email.split('@')[0], // Assuming user object has a name or email
-      rating,
-      text: commentText,
-      date: new Date().toISOString().slice(0, 10),
-    });
-    setCommentText("");
-    setRating(0);
+    
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/products/comments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          productId,
+          rating,
+          text: commentText,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit comment');
+      }
+
+      setCommentText("");
+      setRating(0);
+      // Ensure onCommentSubmitted is called to trigger a re-fetch of comments in the parent
+      if (onCommentSubmitted) {
+        onCommentSubmitted();
+      }
+    } catch (error) {
+      console.error('Error submitting comment:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (!user) {
@@ -76,9 +95,10 @@ const CommentForm = ({ onCommentSubmit, productId }) => {
       </div>
       <button
         type="submit"
-        className="w-full py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition duration-200"
+        disabled={isLoading}
+        className="w-full py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 disabled:bg-gray-400 transition duration-200"
       >
-        Submit Review
+        {isLoading ? 'Submitting...' : 'Submit Review'}
       </button>
     </form>
   );

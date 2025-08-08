@@ -4,10 +4,26 @@ import { FaStar, FaTrashAlt } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
 
 // এটি একটি পণ্যের সমস্ত কমেন্ট দেখাবে
-const AllComments = ({ comments, onDeleteComment }) => {
+const AllComments = ({ comments, onCommentDeleted }) => {
   const { user } = useAuth();
+  
+  const handleDelete = async (commentId) => {
+    try {
+      const response = await fetch(`/api/products/comments/${commentId}`, {
+        method: 'DELETE',
+      });
 
-  if (comments.length === 0) {
+      if (!response.ok) {
+        throw new Error('Failed to delete comment');
+      }
+
+      onCommentDeleted(); // Tell parent component to re-fetch comments
+    } catch (error) {
+      console.error('Error deleting comment:', error);
+    }
+  };
+
+  if (!comments || comments.length === 0) {
     return (
       <div className="text-center text-gray-500 p-4">
         No reviews yet. Be the first to comment!
@@ -19,7 +35,7 @@ const AllComments = ({ comments, onDeleteComment }) => {
     <div className="space-y-6">
       {comments.map((comment) => (
         <div
-          key={comment.id}
+          key={comment._id}
           className="p-5 bg-white rounded-lg shadow-sm border border-gray-200 transition-shadow duration-200 hover:shadow-md"
         >
           <div className="flex items-center justify-between mb-2">
@@ -34,7 +50,7 @@ const AllComments = ({ comments, onDeleteComment }) => {
             </div>
             {user && user._id === comment.userId && (
               <button
-                onClick={() => onDeleteComment(comment.id)}
+                onClick={() => handleDelete(comment._id)}
                 className="text-red-500 hover:text-red-700 transition-colors"
                 title="Delete your comment"
               >
@@ -43,7 +59,7 @@ const AllComments = ({ comments, onDeleteComment }) => {
             )}
           </div>
           <p className="text-gray-600 mb-2">{comment.text}</p>
-          <span className="text-xs text-gray-400">Reviewed on: {comment.date}</span>
+          <span className="text-xs text-gray-400">Reviewed on: {new Date(comment.date).toLocaleDateString()}</span>
         </div>
       ))}
     </div>

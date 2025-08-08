@@ -7,6 +7,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import CommentForm from "./CommentForm"; // নতুন ইম্পোর্ট
 import AllComments from "./AllComments"; // নতুন ইম্পোর্ট
+import { useEffect } from "react";
 
 // মূল ProductModal কম্পোনেন্ট
 const ProductModal = ({ product, onClose }) => {
@@ -15,10 +16,7 @@ const ProductModal = ({ product, onClose }) => {
     product ? product.productImage : ""
   );
   // Mock comments state for demonstration
-  const [comments, setComments] = useState([
-    { id: '1', userId: 'mock-user-123', userName: 'Jane Doe', rating: 5, text: 'This is an amazing product, I highly recommend it!', date: '2023-10-27' },
-    { id: '2', userId: 'another-user-456', userName: 'John Smith', rating: 4, text: 'Good quality for the price, fast delivery.', date: '2023-10-26' },
-  ]);
+  const [comments, setComments] = useState([]);
 
   const router = useRouter();
   const { user } = useAuth();
@@ -26,6 +24,27 @@ const ProductModal = ({ product, onClose }) => {
   if (!product) {
     return null;
   }
+
+  // Function to fetch comments
+  const fetchComments = async () => {
+    try {
+      const response = await fetch(`/api/products/comments?productId=${product._id}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch comments');
+      }
+      const data = await response.json();
+      setComments(data);
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+    }
+  };
+
+  // Fetch comments when component mounts or product changes
+  useEffect(() => {
+    if (product?._id) {
+      fetchComments();
+    }
+  }, [product?._id]);
 
   const handleQuantityChange = (type) => {
     if (type === "increase") {
@@ -47,16 +66,13 @@ const ProductModal = ({ product, onClose }) => {
   };
 
   // Handler for adding a new comment (mock function)
-  const handleCommentSubmit = (newComment) => {
-    const newId = crypto.randomUUID();
-    setComments(prevComments => [...prevComments, { ...newComment, id: newId }]);
-    console.log('Review submitted successfully!');
+  const handleCommentSubmit = () => {
+    fetchComments();
   };
 
   // Handler for deleting a comment (mock function)
-  const handleDeleteComment = (commentId) => {
-    setComments(prevComments => prevComments.filter(comment => comment.id !== commentId));
-    console.log('Comment deleted successfully!');
+  const handleDeleteComment = () => {
+    fetchComments();
   };
 
   return (
@@ -163,12 +179,12 @@ const ProductModal = ({ product, onClose }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-6">
                 <h3 className="text-2xl font-bold text-gray-800">Write a Review</h3>
-                <CommentForm onCommentSubmit={handleCommentSubmit} productId={product._id} />
+                <CommentForm onCommentSubmitted={handleCommentSubmit} productId={product._id} />
               </div>
               <div className="space-y-6">
                 <h3 className="text-2xl font-bold text-gray-800">Customer Reviews</h3>
                 <div className="max-h-96 overflow-y-auto pr-2">
-                  <AllComments comments={comments} onDeleteComment={handleDeleteComment} />
+                  <AllComments comments={comments} onCommentDeleted={handleDeleteComment} />
                 </div>
               </div>
             </div>
