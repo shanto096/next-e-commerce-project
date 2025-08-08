@@ -1,5 +1,5 @@
 'use client';
-import { categories } from '../data/products';
+import { categories } from '../../data/products';
 
 export default function CategoryTabs({ selected, onSelect }) {
   return (

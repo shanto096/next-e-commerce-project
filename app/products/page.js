@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import CategoryTabs from '../components/CategoryTabs';
-import ProductList from '../components/ProductList';
+import CategoryTabs from '../components/product/CategoryTabs';
+import ProductList from '../components/product/ProductList';
 import axios from 'axios';
 
 export default function HomePage() {

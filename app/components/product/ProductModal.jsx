@@ -2,8 +2,8 @@
 "use client";
 import { useState } from "react";
 import { FaHeart } from "react-icons/fa";
-import { addToCart } from "../../lib/cart"; // নতুন ইম্পোর্ট
-import { useAuth } from "../context/AuthContext";
+import { addToCart } from "../../../lib/cart"; // নতুন ইম্পোর্ট
+import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 
 const ProductModal = ({ product, onClose }) => {
