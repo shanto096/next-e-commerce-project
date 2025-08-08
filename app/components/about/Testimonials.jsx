@@ -67,27 +67,33 @@ const testimonials = [
     feedback: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod te mp or incididunt ut labore et dolore magna aliqua.',
     name: 'Rosalina D. William',
     title: 'Founder',
-  },// ... same as before (unchanged testimonial data)
-];
+  },
+]
 
 const Testimonials = () => {
   const sliderRef = useRef(null);
   const [isHovered, setIsHovered] = useState(false);
 
+  // Doubled testimonials for seamless infinite scrolling
+  const extendedTestimonials = [...testimonials, ...testimonials];
+
   useEffect(() => {
     let scrollInterval;
-    const scrollStep = 3;
+    const scrollStep = 2; // Adjust speed here
+    const resetThreshold = sliderRef.current?.scrollWidth / 2;
 
     const startAutoScroll = () => {
-      if (!sliderRef.current) return;
+      const slider = sliderRef.current;
+      if (!slider) return;
+
       scrollInterval = setInterval(() => {
-        const slider = sliderRef.current;
-        if (slider.scrollLeft + slider.clientWidth >= slider.scrollWidth) {
+        if (slider.scrollLeft >= resetThreshold) {
+          // Smoothly reset to start (looping effect)
           slider.scrollLeft = 0;
         } else {
           slider.scrollLeft += scrollStep;
         }
-      }, 20);
+      }, 20); // Adjust interval here
     };
 
     if (!isHovered) {
@@ -98,19 +104,19 @@ const Testimonials = () => {
   }, [isHovered]);
 
   return (
-    <section  style={{
-      background: 'var(--card-bg)',
-      color: 'var(--foreground)',
-    }}className=" py-20 md:py-24 relative">
-      {/* Section Title */}
+    <section
+      style={{
+        background: 'var(--card-bg)',
+        color: 'var(--foreground)',
+      }}
+      className="py-20 md:py-24 relative"
+    >
       <div className="text-center mb-12 px-4">
-       
         <h2 className="text-4xl lg:text-5xl font-bold">
           Clients Feedbacks<span className="text-green-600">.</span>
         </h2>
       </div>
 
-      {/* Slider */}
       <div className="container mx-auto px-4 relative">
         <div
           ref={sliderRef}
@@ -118,20 +124,22 @@ const Testimonials = () => {
           onMouseLeave={() => setIsHovered(false)}
           className="flex overflow-x-auto space-x-6 scroll-smooth hide-scrollbar"
         >
-          {testimonials.map((testimonial, index) => (
+          {extendedTestimonials.map((testimonial, index) => (
             <div
               key={index}
               className="flex-none w-[80%] sm:w-[50%] md:w-[40%] lg:w-[30%] snap-start"
             >
               <div
-               style={{
-                background: 'var(--background)',
-                color: 'var(--foreground)',
-              }} className=" p-6 md:p-8 rounded-lg shadow-md relative overflow-hidden h-full">
+                style={{
+                  background: 'var(--background)',
+                  color: 'var(--foreground)',
+                }}
+                className="p-6 md:p-8 rounded-lg shadow-md relative overflow-hidden h-full"
+              >
                 <div className="absolute bottom-0 right-0 opacity-10 translate-x-1/4 translate-y-1/4 pointer-events-none">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-48 w-48 "
+                    className="h-48 w-48"
                     viewBox="0 0 24 24"
                     fill="currentColor"
                   >
@@ -150,14 +158,14 @@ const Testimonials = () => {
                     />
                   </div>
                   <div>
-                    <p className=" leading-relaxed text-sm">
+                    <p className="leading-relaxed text-sm">
                       {testimonial.feedback}
                     </p>
                   </div>
                 </div>
 
                 <div className="relative z-10">
-                  <p className="font-bold  mt-4">{testimonial.name}</p>
+                  <p className="font-bold mt-4">{testimonial.name}</p>
                   <p className="text-[#80d00f] text-sm">{testimonial.title}</p>
                 </div>
               </div>
