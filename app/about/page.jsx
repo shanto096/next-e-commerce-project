@@ -13,7 +13,7 @@ const About = () => {
            <TrustedOrganic/>
            <WhyChooseUs/>
            <TeamMembers/>
-           {/* <Testimonials/> */}
+           <Testimonials/>
            <FAQSection/>
         </div>
     );

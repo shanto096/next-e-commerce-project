@@ -1,8 +1,6 @@
-// app/components/Testimonials.jsx
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
-
 
 const testimonials = [
   {
@@ -70,90 +68,81 @@ const testimonials = [
     name: 'Rosalina D. William',
     title: 'Founder',
   },
-];
+]
 
 const Testimonials = () => {
   const sliderRef = useRef(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
+  const [isHovered, setIsHovered] = useState(false);
 
-  const checkScroll = () => {
-    if (sliderRef.current) {
-      setCanScrollLeft(sliderRef.current.scrollLeft > 0);
-      setCanScrollRight(
-        sliderRef.current.scrollWidth > sliderRef.current.clientWidth + sliderRef.current.scrollLeft
-      );
-    }
-  };
+  // Doubled testimonials for seamless infinite scrolling
+  const extendedTestimonials = [...testimonials, ...testimonials];
 
   useEffect(() => {
-    checkScroll();
-    const handleResize = () => checkScroll();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    let scrollInterval;
+    const scrollStep = 2; // Adjust speed here
+    const resetThreshold = sliderRef.current?.scrollWidth / 2;
 
-  const scroll = (direction) => {
-    if (sliderRef.current) {
-      const scrollAmount = sliderRef.current.clientWidth;
-      sliderRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth',
-      });
-      setTimeout(checkScroll, 500); // Check scroll position after animation
+    const startAutoScroll = () => {
+      const slider = sliderRef.current;
+      if (!slider) return;
+
+      scrollInterval = setInterval(() => {
+        if (slider.scrollLeft >= resetThreshold) {
+          // Smoothly reset to start (looping effect)
+          slider.scrollLeft = 0;
+        } else {
+          slider.scrollLeft += scrollStep;
+        }
+      }, 20); // Adjust interval here
+    };
+
+    if (!isHovered) {
+      startAutoScroll();
     }
-  };
+
+    return () => clearInterval(scrollInterval);
+  }, [isHovered]);
 
   return (
-    <section className="bg-[#f9f9f5] py-20 md:py-24 relative">
-      {/* Section Title */}
+    <section
+      style={{
+        background: 'var(--card-bg)',
+        color: 'var(--foreground)',
+      }}
+      className="py-20 md:py-24 relative"
+    >
       <div className="text-center mb-12 px-4">
-        <p className="text-sm font-semibold text-[#80d00f] tracking-wide uppercase mb-2">
-          // TESTIMONIALS //
-        </p>
-        <h2 className="text-4xl lg:text-5xl font-bold text-gray-800">
-          Clients Feedbacks<span className="text-[#80d00f]">.</span>
+        <h2 className="text-4xl lg:text-5xl font-bold">
+          Clients Feedbacks<span className="text-green-600">.</span>
         </h2>
       </div>
 
-      {/* Testimonial Slider and Navigation */}
       <div className="container mx-auto px-4 relative">
-        {/* Custom Previous Arrow */}
-        {canScrollLeft && (
-          <button
-            onClick={() => scroll('left')}
-            className="absolute top-1/2 -left-4 md:-left-8 transform -translate-y-1/2 z-10 cursor-pointer bg-[#80d00f] text-white p-3 rounded-full shadow-lg"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-        )}
-
-        {/* Custom Next Arrow */}
-        {canScrollRight && (
-          <button
-            onClick={() => scroll('right')}
-            className="absolute top-1/2 -right-4 md:-right-8 transform -translate-y-1/2 z-10 cursor-pointer bg-[#80d00f] text-white p-3 rounded-full shadow-lg"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-        )}
-
-        {/* Slider Container */}
-        <div 
-          ref={sliderRef} 
+        <div
+          ref={sliderRef}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
           className="flex overflow-x-auto space-x-6 scroll-smooth hide-scrollbar"
-          onScroll={checkScroll}
         >
-          {testimonials.map((testimonial, index) => (
-            <div key={index} className="flex-none w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.33%-1rem)] snap-start">
-              <div className="bg-white p-6 md:p-8 rounded-lg shadow-md relative overflow-hidden h-full">
-                {/* Speech bubble SVG background */}
+          {extendedTestimonials.map((testimonial, index) => (
+            <div
+              key={index}
+              className="flex-none w-[80%] sm:w-[50%] md:w-[40%] lg:w-[30%] snap-start"
+            >
+              <div
+                style={{
+                  background: 'var(--background)',
+                  color: 'var(--foreground)',
+                }}
+                className="p-6 md:p-8 rounded-lg shadow-md relative overflow-hidden h-full"
+              >
                 <div className="absolute bottom-0 right-0 opacity-10 translate-x-1/4 translate-y-1/4 pointer-events-none">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-48 w-48 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-48 w-48"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
                     <path d="M7 12c0-2.76 2.24-5 5-5s5 2.24 5 5-2.24 5-5 5h-1v2.5L7.5 17 7 17v-5zm5-3c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
                   </svg>
                 </div>
@@ -169,13 +158,14 @@ const Testimonials = () => {
                     />
                   </div>
                   <div>
-                    <p className="text-gray-600 leading-relaxed text-sm">{testimonial.feedback}</p>
+                    <p className="leading-relaxed text-sm">
+                      {testimonial.feedback}
+                    </p>
                   </div>
                 </div>
-                
-                {/* Client info */}
+
                 <div className="relative z-10">
-                  <p className="font-bold text-gray-800 mt-4">{testimonial.name}</p>
+                  <p className="font-bold mt-4">{testimonial.name}</p>
                   <p className="text-[#80d00f] text-sm">{testimonial.title}</p>
                 </div>
               </div>
