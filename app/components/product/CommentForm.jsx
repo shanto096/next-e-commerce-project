@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { FaStar } from "react-icons/fa";
 import { useAuth } from "../../context/AuthContext";
+import toast from "react-hot-toast";
 
 // এটি ব্যবহারকারীদের রেটিং এবং কমেন্ট লেখার জন্য একটি ফর্ম
 const CommentForm = ({ onCommentSubmitted, productId }) => {
@@ -14,8 +15,16 @@ const CommentForm = ({ onCommentSubmitted, productId }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!commentText || rating === 0) {
-      console.error("Please provide a rating and a comment.");
+    if (!commentText && rating === 0) {
+      toast.error("Please provide both rating and comment.");
+      return;
+    }
+    if (!commentText) {
+      toast.error("Please write a comment.");
+      return;
+    }
+    if (rating === 0) {
+      toast.error("Please select a rating.");
       return;
     }
     
@@ -39,12 +48,14 @@ const CommentForm = ({ onCommentSubmitted, productId }) => {
 
       setCommentText("");
       setRating(0);
+      toast.success("Review submitted successfully!");
       // Ensure onCommentSubmitted is called to trigger a re-fetch of comments in the parent
       if (onCommentSubmitted) {
         onCommentSubmitted();
       }
     } catch (error) {
       console.error('Error submitting comment:', error);
+      toast.error("Failed to submit review. Please try again.");
     } finally {
       setIsLoading(false);
     }
