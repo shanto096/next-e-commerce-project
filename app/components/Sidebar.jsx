@@ -9,6 +9,7 @@ const sidebarItems = [
   { name: "User", href: "/admin/user" },
   { name: "Products", href: "/admin/products" },
   { name: "Recent News", href: "/admin/recent-news" },
+  { name: "Messages", href: "/admin/messages" },
   { name: "Website", href: "/" },
 ];
 
@@ -17,14 +18,14 @@ const Sidebar = () => {
   const pathname = usePathname(); // ✅ use this instead of location.pathname
 
   return (
-    <div className="fixed">
+    <div  className="fixed ">
       <nav>
         <ul className="list-none ">
           {sidebarItems.map((item) => (
             <li
               key={item.href}
-              className={`mb-4 rounded px-4 py-2 transition-colors  ${
-                pathname === item.href ? "bg-green-500 text-white " : "bg-white"
+              className={`mb-4 rounded px-4 py-2 transition-colors text-black   ${
+                pathname === item.href ? "bg-green-500 " : "bg-white"
               }`}
             >
               <Link href={item.href} className="no-underline text-inherit block">

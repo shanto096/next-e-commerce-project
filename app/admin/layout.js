@@ -43,10 +43,16 @@ export default async function AdminLayout({ children }) { // async কিওয�
   return (
     <>
     <Suspense fallback={<div>Loading...</div>}>
-    <div className="">
+    <div style={{
+      background: 'var(--background)',
+      color: 'var(--foreground)',
+    }} className="">
     <DashboardNavbar/>
-    <div className="flex min-h-screen  ">
-      <aside className="w-56 bg-gray-100 p-6">
+    <div  className="flex min-h-screen  ">
+      <aside style={{
+      background: 'var(--card-bg)',
+      color: 'var(--foreground)',
+    }} className="w-56  p-6">
        <Sidebar/>
       </aside>
       <main className="flex-1 p-8">{children}</main>
