@@ -137,54 +137,54 @@ const Navbar = () => {
 
       {/* Navigation links */}
       <ul className="flex space-x-6 items-center">
-        {/* Notifications: always show icon; badge only when count > 0 */}
-        <li className="relative" ref={notificationsRef}>
-          <button onClick={toggleNotifications} className="relative text-white p-2 rounded-full hover:bg-gray-800 transition duration-300">
-            <IoNotificationsOutline className="w-6 h-6" />
-            {notificationCount > 0 && (
-              <span className={`absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full h-5 min-w-[1.25rem] px-1 flex items-center justify-center ${animateBadge ? 'animate-bounce' : ''}`}>
-                {notificationCount}
-              </span>
-            )}
-          </button>
-          {showNotifications && (
-            <div className="absolute right-0 mt-3 w-80 bg-gray-800 text-white rounded-lg shadow-xl overflow-hidden z-20">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
-                <span className="font-semibold">Notifications</span>
-                {notificationCount > 0 && (
-                  <button onClick={markAllAsRead} className="text-xs text-blue-400 hover:text-blue-300">
-                    Mark all as read
-                  </button>
-                )}
-              </div>
-              <div className="max-h-80 overflow-y-auto">
-                {notifications.length === 0 ? (
-                  <div className="px-4 py-6 text-gray-400 text-sm">No notifications</div>
-                ) : (
-                  notifications.map((n) => (
-                    <div key={n.id} className={`px-4 py-3 border-b border-gray-700 last:border-0 ${n.read ? 'bg-gray-800' : 'bg-gray-700'}`}>
-                      <div className="flex items-start gap-3">
-                        <div className={`mt-1 h-2 w-2 rounded-full ${n.read ? 'bg-gray-500' : 'bg-green-400'}`}></div>
-                        <div className="flex-1">
-                          <p className="text-sm font-semibold">{n.title}</p>
-                          <p className="text-xs text-gray-300 mt-0.5">{n.message}</p>
-                          <p className="text-[10px] text-gray-400 mt-1">{n.time}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-              <div className="px-4 py-2 bg-gray-900 text-center text-sm text-gray-300">
-                You are up to date
-              </div>
-            </div>
-          )}
-        </li>
 
         {/* Conditional rendering for authenticated vs. unauthenticated users */}
          
-          <li className="relative">
+          <li className="relative flex items-center space-x-3">
+            {/* Notifications next to user */}
+            <div className="relative" ref={notificationsRef}>
+              <button onClick={toggleNotifications} className="relative text-white p-2 rounded-full hover:bg-gray-800 transition duration-300">
+                <IoNotificationsOutline className="w-6 h-6" />
+                {notificationCount > 0 && (
+                  <span className={`absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full h-5 min-w-[1.25rem] px-1 flex items-center justify-center ${animateBadge ? 'animate-bounce' : ''}`}>
+                    {notificationCount}
+                  </span>
+                )}
+              </button>
+              {showNotifications && (
+                <div className="absolute right-0 mt-3 w-80 bg-gray-800 text-white rounded-lg shadow-xl overflow-hidden z-20">
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
+                    <span className="font-semibold">Notifications</span>
+                    {notificationCount > 0 && (
+                      <button onClick={markAllAsRead} className="text-xs text-blue-400 hover:text-blue-300">
+                        Mark all as read
+                      </button>
+                    )}
+                  </div>
+                  <div className="max-h-80 overflow-y-auto">
+                    {notifications.length === 0 ? (
+                      <div className="px-4 py-6 text-gray-400 text-sm">No notifications</div>
+                    ) : (
+                      notifications.map((n) => (
+                        <div key={n.id} className={`px-4 py-3 border-b border-gray-700 last:border-0 ${n.read ? 'bg-gray-800' : 'bg-gray-700'}`}>
+                          <div className="flex items-start gap-3">
+                            <div className={`mt-1 h-2 w-2 rounded-full ${n.read ? 'bg-gray-500' : 'bg-green-400'}`}></div>
+                            <div className="flex-1">
+                              <p className="text-sm font-semibold">{n.title}</p>
+                              <p className="text-xs text-gray-300 mt-0.5">{n.message}</p>
+                              <p className="text-[10px] text-gray-400 mt-1">{n.time}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  <div className="px-4 py-2 bg-gray-900 text-center text-sm text-gray-300">
+                    You are up to date
+                  </div>
+                </div>
+              )}
+            </div>
             {/* User Avatar and Name */}
             <button
               onClick={toggleUserModal}
