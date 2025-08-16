@@ -19,11 +19,22 @@ export default function ContactSection() {
   };
 
   // Step 3: Submit handler
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Form Data:', formData); // You can send to backend here
     // Reset form (optional)
-    setFormData({ email: '', subject: '', message: '' });
+    try{
+      const response = await fetch('/api/message',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(formData)
+      });
+      if(response.ok){
+        setFormData({ email: '', subject: '', message: '' });
+      }
+    }catch(error){
+      console.error('Error sending message:', error);
+    }
   };
 
   return (
