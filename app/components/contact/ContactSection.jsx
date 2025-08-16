@@ -6,7 +6,7 @@ import MapComponent from './MapComponent';
 export default function ContactSection() {
   // Step 1: State
   const [formData, setFormData] = useState({
-    name: '',
+ 
     email: '',
     subject: '',
     message: '',
@@ -23,7 +23,7 @@ export default function ContactSection() {
     e.preventDefault();
     console.log('Form Data:', formData); // You can send to backend here
     // Reset form (optional)
-    setFormData({ name: '', email: '', subject: '', message: '' });
+    setFormData({ email: '', subject: '', message: '' });
   };
 
   return (
@@ -73,20 +73,7 @@ export default function ContactSection() {
 
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="flex flex-col sm:flex-row gap-4">
-                <div className="w-full">
-                  <label htmlFor="name" className="block mb-2 font-medium text-sm">
-                    Name<span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    id="name"
-                    name="name"
-                    type="text"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className="w-full p-3 border rounded bg-transparent"
-                    required
-                  />
-                </div>
+              
                 <div className="w-full">
                   <label htmlFor="email" className="block mb-2 font-medium text-sm">
                     Email<span className="text-red-500">*</span>
