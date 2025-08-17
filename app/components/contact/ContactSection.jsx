@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import MapComponent from './MapComponent';
+import toast from 'react-hot-toast';
 
 export default function ContactSection() {
   // Step 1: State
@@ -31,9 +32,13 @@ export default function ContactSection() {
       });
       if(response.ok){
         setFormData({ email: '', subject: '', message: '' });
+        toast.success('Message sent successfully!');
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.message || 'Failed to send message.');
       }
     }catch(error){
-      console.error('Error sending message:', error);
+      toast.error('Error sending message: ' + error.message);
     }
   };
 

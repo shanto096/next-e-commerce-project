@@ -12,6 +12,13 @@ export async function POST(request) {
     try {
         const { email, message, subject } = await request.json();
         const user = authResult.user;
+        const userEmailFromToken = authResult.email;
+
+        // Check if the email from the request body matches the logged-in user's email
+        if (email !== userEmailFromToken) {
+            return NextResponse.json({ message: "Email in the form does not match the logged-in user's email." }, { status: 403 });
+        }
+
         const client = await clientPromise;
         const db = client.db("E-commerceDB");
         const messageCollection = db.collection("message");
