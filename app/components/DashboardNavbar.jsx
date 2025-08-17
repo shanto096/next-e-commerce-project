@@ -58,76 +58,82 @@ const Navbar = () => {
     };
   }, [showNotifications]);
 
-  // Sync notification count from localStorage and custom events
+  // Fetch notifications from the backend
   useEffect(() => {
-    const seedDummyNotifications = () => {
-      const dummy = [
-        { id: 'n1', title: 'New Order', message: 'Order #1024 placed successfully.', time: '2 min ago', read: false },
-        { id: 'n2', title: 'Stock Alert', message: 'Product Maca Root is low on stock.', time: '15 min ago', read: false },
-        { id: 'n3', title: 'New User', message: 'A new user registered: john@example.com', time: '1 hr ago', read: true },
-        { id: 'n4', title: 'Payout', message: 'Your weekly payout has been processed.', time: 'Yesterday', read: true },
-      ];
-      localStorage.setItem('notifications', JSON.stringify(dummy));
-      const unread = dummy.filter(n => !n.read).length;
-      localStorage.setItem('notificationsCount', String(unread));
-      return dummy;
-    };
-
-    const getNotificationsCount = () => {
-      if (typeof window === 'undefined') return 0;
-      const stored = localStorage.getItem('notificationsCount');
-      const parsed = stored ? parseInt(stored, 10) : 0;
-      return Number.isNaN(parsed) ? 0 : parsed;
-    };
-
-    const updateCount = () => {
-      // Refresh list first
-      let list = [];
+    const fetchNotifications = async () => {
+      if (!user || user.role !== 'admin') { // Only fetch for admin users
+        setNotificationCount(0);
+        setNotifications([]);
+        return;
+      }
       try {
-        const raw = localStorage.getItem('notifications');
-        list = raw ? JSON.parse(raw) : [];
-      } catch {}
-      if (!Array.isArray(list) || list.length === 0) {
-        list = seedDummyNotifications();
-      }
-      setNotifications(list);
-      const unreadLen = list.filter(n => !n.read).length;
-      localStorage.setItem('notificationsCount', String(unreadLen));
+        const res = await fetch('/api/notifications');
+        if (!res.ok) {
+          throw new Error(`Error: ${res.status}`);
+        }
+        const data = await res.json();
+        setNotifications(data.notifications.map(n => ({ // Map to consistent notification structure
+          id: n._id,
+          title: `New Message from ${n.email}`,
+          message: n.subject || n.message, // Use subject or message as main notification text
+          time: new Date(n.createdAt).toLocaleString(),
+          read: n.status === 'read',
+          rawMessage: n, // Store raw message for detail view if needed
+        })));
+        
+        const nextCount = data.count;
+        const prevCount = previousCountRef.current;
 
-      const nextCount = getNotificationsCount();
-      const prevCount = previousCountRef.current;
-      setNotificationCount(nextCount);
-      if (nextCount > prevCount) {
-        setAnimateBadge(true);
-        setTimeout(() => setAnimateBadge(false), 300);
+        setNotificationCount(nextCount);
+        if (nextCount > prevCount) {
+          setAnimateBadge(true);
+          setTimeout(() => setAnimateBadge(false), 300);
+        }
+        previousCountRef.current = nextCount;
+
+      } catch (err) {
+        console.error("Failed to fetch notifications:", err);
+        setNotificationCount(0);
+        setNotifications([]);
       }
-      previousCountRef.current = nextCount;
     };
 
-    updateCount();
-    window.addEventListener('storage', updateCount);
-    window.addEventListener('notificationsUpdated', updateCount);
-    return () => {
-      window.removeEventListener('storage', updateCount);
-      window.removeEventListener('notificationsUpdated', updateCount);
-    };
-  }, []);
+    fetchNotifications();
+
+    // Poll for new notifications every 30 seconds (adjust as needed)
+    const interval = setInterval(fetchNotifications, 30000);
+
+    return () => clearInterval(interval);
+  }, [user]);
 
   const toggleNotifications = () => {
     setShowNotifications((prev) => !prev);
   };
 
-  const markAllAsRead = () => {
-    const updated = notifications.map(n => ({ ...n, read: true }));
-    setNotifications(updated);
-    localStorage.setItem('notifications', JSON.stringify(updated));
-    localStorage.setItem('notificationsCount', '0');
-    window.dispatchEvent(new Event('notificationsUpdated'));
+  const markAllAsRead = async () => {
+    try {
+      const res = await fetch('/api/notifications', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error(`Error: ${res.status}`);
+      }
+      // After marking as read on the backend, refetch to update UI
+      const updated = notifications.map(n => ({ ...n, read: true }));
+      setNotifications(updated);
+      setNotificationCount(0);
+    } catch (err) {
+      console.error("Failed to mark all notifications as read:", err);
+    }
   };
 
   return (
     // Navbar container with a sleek dark background
-    <nav className="w-full flex items-center justify-between py-2 px-8 border-b border-gray-800 bg-gray-900 shadow-lg relative z-10 sticky top-0">
+    <nav className="w-full flex items-center justify-between py-2 px-8 border-b border-gray-800 bg-gray-900 shadow-lg sticky top-0">
       {/* Brand/Logo */}
       <div className="text-2xl font-extrabold text-white tracking-wide">
         <Link href="/" className="hover:text-gray-300 transition duration-300">
@@ -170,9 +176,9 @@ const Navbar = () => {
                           <div className="flex items-start gap-3">
                             <div className={`mt-1 h-2 w-2 rounded-full ${n.read ? 'bg-gray-500' : 'bg-green-400'}`}></div>
                             <div className="flex-1">
-                              <p className="text-sm font-semibold">{n.title}</p>
-                              <p className="text-xs text-gray-300 mt-0.5">{n.message}</p>
-                              <p className="text-[10px] text-gray-400 mt-1">{n.time}</p>
+                                <p className="text-sm font-semibold">{n.title}</p>
+                                <p className="text-xs text-gray-300 mt-0.5">{n.message}</p>
+                                <p className="text-[10px] text-gray-400 mt-1">{n.time}</p>
                             </div>
                           </div>
                         </div>
