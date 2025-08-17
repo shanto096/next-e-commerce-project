@@ -112,9 +112,38 @@ const AdminMessagePage = () => {
         setIsViewModalOpen(false);
     };
 
-    const handleViewMessageDetail = (message) => {
+    const handleViewMessageDetail = async (message) => {
         setSelectedMessageDetail(message);
         setIsMessageDetailModalOpen(true);
+
+        // Update message status to 'read' if it's 'pending'
+        if (message.status === 'pending') {
+            try {
+                const res = await fetch('/api/message', {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ messageId: message._id, status: 'read' }),
+                });
+
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    console.error('Failed to update message status:', errorData.message);
+                    // Optionally, show an error to the user
+                } else {
+                    // Update local state to reflect the 'read' status
+                    setMessages(prevMessages =>
+                        prevMessages.map(msg =>
+                            msg._id === message._id ? { ...msg, status: 'read' } : msg
+                        )
+                    );
+                }
+            } catch (err) {
+                console.error('Error updating message status:', err);
+                // Optionally, show an error to the user
+            }
+        }
     };
 
     const handleCloseMessageDetail = () => {
