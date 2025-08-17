@@ -5,6 +5,7 @@ import Footer from './components/Footer';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { Suspense } from 'react';
+import { Toaster } from 'react-hot-toast';
 
 export default function ClientLayout({ children }) {
     const pathname = usePathname();
@@ -17,6 +18,8 @@ export default function ClientLayout({ children }) {
             ThemeProvider >
             <
             AuthProvider > { shouldShowNavbar && < Navbar / > } { children } { shouldShowNavbar && < Footer / > } <
+            Toaster position = "top-center" / >
+            <
             /AuthProvider> <
             /ThemeProvider> <
             /Suspense>

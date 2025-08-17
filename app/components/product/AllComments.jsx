@@ -42,6 +42,7 @@ const AllComments = ({ comments, onCommentDeleted }) => {
             <div className="flex items-center space-x-3">
               <span className="font-semibold text-lg text-gray-800">{comment.userName}</span>
               {/* Star rating display */}
+              
               <div className="flex text-yellow-400">
                 {[...Array(5)].map((_, index) => (
                   <FaStar key={index} className={index < comment.rating ? '' : 'text-gray-300'} />
@@ -58,6 +59,7 @@ const AllComments = ({ comments, onCommentDeleted }) => {
               </button>
             )}
           </div>
+          
           <p className="text-gray-600 mb-2">{comment.text}</p>
           <span className="text-xs text-gray-400">Reviewed on: {new Date(comment.date).toLocaleDateString()}</span>
         </div>

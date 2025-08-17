@@ -16,10 +16,22 @@ export async function GET(request) {
         const client = await clientPromise;
         const db = client.db("E-commerceDB");
         const commentsCollection = db.collection("comments");
+        const usersCollection = db.collection("users");
 
         const productComments = await commentsCollection.find({ productId: new ObjectId(productId) }).toArray();
 
-        return NextResponse.json(productComments, { status: 200 });
+        // Fetch user names for each comment
+        const commentsWithUserDetails = await Promise.all(
+            productComments.map(async(comment) => {
+                const user = await usersCollection.findOne({ _id: comment.userId }, { projection: { name: 1, _id: 0 } });
+                return {
+                    ...comment,
+                    userName: user ? user.name : 'Unknown User',
+                };
+            })
+        );
+
+        return NextResponse.json(commentsWithUserDetails, { status: 200 });
 
     } catch (error) {
         console.error('Error fetching comments:', error);

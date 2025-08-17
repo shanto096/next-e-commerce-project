@@ -2,11 +2,18 @@
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "../context/AuthContext"; // Assuming AuthContext provides user.name, user.email, user.role
+import { IoNotificationsOutline } from 'react-icons/io5';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
+  const [notificationCount, setNotificationCount] = useState(0);
+  const [animateBadge, setAnimateBadge] = useState(false);
+  const previousCountRef = useRef(0);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([]);
   const [showUserModal, setShowUserModal] = useState(false); // State to control user modal visibility
   const modalRef = useRef(null); // Ref for the modal to detect clicks outside
+  const notificationsRef = useRef(null);
 
   // Function to toggle user modal visibility
   const toggleUserModal = () => {
@@ -34,9 +41,99 @@ const Navbar = () => {
     };
   }, [showUserModal]);
 
+  // Close notifications dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target)) {
+        setShowNotifications(false);
+      }
+    };
+    if (showNotifications) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showNotifications]);
+
+  // Fetch notifications from the backend
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      if (!user || user.role !== 'admin') { // Only fetch for admin users
+        setNotificationCount(0);
+        setNotifications([]);
+        return;
+      }
+      try {
+        const res = await fetch('/api/notifications');
+        if (!res.ok) {
+          throw new Error(`Error: ${res.status}`);
+        }
+        const data = await res.json();
+        setNotifications(data.notifications.map(n => ({ // Map to consistent notification structure
+          id: n._id,
+          title: `Message from ${n.email}`,
+          message: n.subject || n.message, // Use subject or message as main notification text
+          time: new Date(n.createdAt).toLocaleString(),
+          read: n.status === 'read',
+          rawMessage: n, // Store raw message for detail view if needed
+        })));
+        
+        const nextCount = data.count;
+        const prevCount = previousCountRef.current;
+
+        setNotificationCount(nextCount);
+        if (nextCount > prevCount) {
+          setAnimateBadge(true);
+          setTimeout(() => setAnimateBadge(false), 300);
+        }
+        previousCountRef.current = nextCount;
+
+      } catch (err) {
+        console.error("Failed to fetch notifications:", err);
+        setNotificationCount(0);
+        setNotifications([]);
+      }
+    };
+
+    fetchNotifications();
+
+    // Poll for new notifications every 30 seconds (adjust as needed)
+    const interval = setInterval(fetchNotifications, 30000);
+
+    return () => clearInterval(interval);
+  }, [user]);
+
+  const toggleNotifications = () => {
+    setShowNotifications((prev) => !prev);
+  };
+
+  const markAllAsRead = async () => {
+    try {
+      const res = await fetch('/api/notifications', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error(`Error: ${res.status}`);
+      }
+      // After marking as read on the backend, refetch to update UI
+      const updated = notifications.map(n => ({ ...n, read: true }));
+      setNotifications(updated);
+      setNotificationCount(0);
+    } catch (err) {
+      console.error("Failed to mark all notifications as read:", err);
+    }
+  };
+
   return (
     // Navbar container with a sleek dark background
-    <nav className="w-full flex items-center justify-between py-2 px-8 border-b border-gray-800 bg-gray-900 shadow-lg relative z-10 sticky top-0">
+    <nav className="w-full flex items-center justify-between py-2 px-8 border-b border-gray-800 bg-gray-900 shadow-lg sticky top-0">
       {/* Brand/Logo */}
       <div className="text-2xl font-extrabold text-white tracking-wide">
         <Link href="/" className="hover:text-gray-300 transition duration-300">
@@ -49,7 +146,51 @@ const Navbar = () => {
 
         {/* Conditional rendering for authenticated vs. unauthenticated users */}
          
-          <li className="relative">
+          <li className="relative flex items-center space-x-3">
+            {/* Notifications next to user */}
+            <div className="relative" ref={notificationsRef}>
+              <button onClick={toggleNotifications} className="relative text-white p-2 rounded-full hover:bg-gray-800 transition duration-300">
+                <IoNotificationsOutline className="w-6 h-6" />
+                {notificationCount > 0 && (
+                  <span className={`absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full h-5 min-w-[1.25rem] px-1 flex items-center justify-center ${animateBadge ? 'animate-bounce' : ''}`}>
+                    {notificationCount}
+                  </span>
+                )}
+              </button>
+              {showNotifications && (
+                <div className="absolute right-0 mt-3 w-80 bg-gray-800 text-white rounded-lg shadow-xl overflow-hidden z-20">
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
+                    <span className="font-semibold">Notifications</span>
+                    {notificationCount > 0 && (
+                      <button onClick={markAllAsRead} className="text-xs text-blue-400 hover:text-blue-300">
+                        Mark all as read
+                      </button>
+                    )}
+                  </div>
+                  <div className="max-h-80 overflow-y-auto">
+                    {notifications.length === 0 ? (
+                      <div className="px-4 py-6 text-gray-400 text-sm">No notifications</div>
+                    ) : (
+                      notifications.map((n) => (
+                        <div key={n.id} className={`px-4 py-3 border-b border-gray-700 last:border-0 ${n.read ? 'bg-gray-800' : 'bg-gray-700'}`}>
+                          <div className="flex items-start gap-3">
+                            <div className={`mt-1 h-2 w-2 rounded-full ${n.read ? 'bg-gray-500' : 'bg-green-400'}`}></div>
+                            <div className="flex-1">
+                                <p className="text-sm font-semibold">{n.title}</p>
+                                <p className="text-xs text-gray-300 mt-0.5">{n.message}</p>
+                                <p className="text-[10px] text-gray-400 mt-1">{n.time}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  <div className="px-4 py-2 bg-gray-900 text-center text-sm text-gray-300">
+                    You are up to date
+                  </div>
+                </div>
+              )}
+            </div>
             {/* User Avatar and Name */}
             <button
               onClick={toggleUserModal}

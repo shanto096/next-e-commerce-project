@@ -2,11 +2,12 @@
 
 import React, { useState } from 'react';
 import MapComponent from './MapComponent';
+import toast from 'react-hot-toast';
 
 export default function ContactSection() {
   // Step 1: State
   const [formData, setFormData] = useState({
-    name: '',
+ 
     email: '',
     subject: '',
     message: '',
@@ -19,11 +20,26 @@ export default function ContactSection() {
   };
 
   // Step 3: Submit handler
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Form Data:', formData); // You can send to backend here
     // Reset form (optional)
-    setFormData({ name: '', email: '', subject: '', message: '' });
+    try{
+      const response = await fetch('/api/message',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(formData)
+      });
+      if(response.ok){
+        setFormData({ email: '', subject: '', message: '' });
+        toast.success('Message sent successfully!');
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.message || 'Failed to send message.');
+      }
+    }catch(error){
+      toast.error('Error sending message: ' + error.message);
+    }
   };
 
   return (
@@ -73,20 +89,7 @@ export default function ContactSection() {
 
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="flex flex-col sm:flex-row gap-4">
-                <div className="w-full">
-                  <label htmlFor="name" className="block mb-2 font-medium text-sm">
-                    Name<span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    id="name"
-                    name="name"
-                    type="text"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className="w-full p-3 border rounded bg-transparent"
-                    required
-                  />
-                </div>
+              
                 <div className="w-full">
                   <label htmlFor="email" className="block mb-2 font-medium text-sm">
                     Email<span className="text-red-500">*</span>
