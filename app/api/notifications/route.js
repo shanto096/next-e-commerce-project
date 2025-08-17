@@ -14,10 +14,10 @@ export async function GET(request) {
         const db = client.db("E-commerceDB");
         const messageCollection = db.collection("message");
 
-        const pendingMessages = await messageCollection.find({ status: "pending" }).toArray();
-        const notificationCount = pendingMessages.length;
+        const allMessages = await messageCollection.find({}).sort({ createdAt: -1 }).toArray();
+        const pendingMessagesCount = allMessages.filter(msg => msg.status === "pending").length;
 
-        return NextResponse.json({ count: notificationCount, notifications: pendingMessages }, { status: 200 });
+        return NextResponse.json({ count: pendingMessagesCount, notifications: allMessages }, { status: 200 });
     } catch (error) {
         console.error("Failed to fetch notifications:", error);
         return NextResponse.json({ message: "Failed to fetch notifications" }, { status: 500 });

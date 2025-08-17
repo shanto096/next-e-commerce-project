@@ -74,7 +74,7 @@ const Navbar = () => {
         const data = await res.json();
         setNotifications(data.notifications.map(n => ({ // Map to consistent notification structure
           id: n._id,
-          title: `New Message from ${n.email}`,
+          title: `Message from ${n.email}`,
           message: n.subject || n.message, // Use subject or message as main notification text
           time: new Date(n.createdAt).toLocaleString(),
           read: n.status === 'read',
